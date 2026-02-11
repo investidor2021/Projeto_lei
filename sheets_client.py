@@ -6,7 +6,11 @@ import os
 
 def get_connection():
     """
-    Estabelece conexão com o Google Sheets usando 'credenciais.json'.
+    Estabelece conexão com o Google Sheets.
+    Suporta dois métodos:
+    1. Streamlit Secrets (para deploy no Streamlit Cloud)
+    2. Arquivo credenciais.json (para desenvolvimento local)
+    
     Retorna o cliente gspread autenticado ou None se falhar.
     """
     scope = [
@@ -14,10 +18,25 @@ def get_connection():
         "https://www.googleapis.com/auth/drive"
     ]
     
+    # Método 1: Tenta usar Streamlit Secrets (para deploy)
+    try:
+        if "gcp_service_account" in st.secrets:
+            creds = ServiceAccountCredentials.from_json_keyfile_dict(
+                st.secrets["gcp_service_account"],
+                scope
+            )
+            client = gspread.authorize(creds)
+            return client
+    except Exception:
+        pass  # Se falhar, tenta o método 2
+    
+    # Método 2: Usa arquivo local credenciais.json (para desenvolvimento)
     creds_file = "credenciais.json"
     
     if not os.path.exists(creds_file):
-        st.error(f"⚠️ Arquivo '{creds_file}' não encontrado na pasta do projeto.")
+        st.error("❌ Arquivo credenciais.json não encontrado e Streamlit Secrets não configurado!")
+        st.info("💡 Para desenvolvimento local: adicione o arquivo credenciais.json")
+        st.info("💡 Para deploy: configure os Secrets no Streamlit Cloud")
         return None
 
     try:
@@ -25,7 +44,7 @@ def get_connection():
         client = gspread.authorize(creds)
         return client
     except Exception as e:
-        st.error(f"Erro ao autenticar no Google Sheets: {e}")
+        st.error(f"❌ Erro ao autenticar no Google Sheets: {e}")
         return None
 
 def get_data_from_sheets(sheet_key, worksheet_name="dotacao"):
