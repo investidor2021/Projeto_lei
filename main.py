@@ -303,16 +303,6 @@ else:
         )
     
     with col3:
-        # Grupo de Natureza (Tipo)
-        opcoes_grupo_nat = audesp_codes.obter_opcoes_grupo_natureza()
-        grupo_nat_selecionado = st.selectbox(
-            "Tipo (Projeto/Atividade)",
-            options=[cod for cod, _ in opcoes_grupo_nat],
-            format_func=lambda x: next(label for cod, label in opcoes_grupo_nat if cod == x),
-            key="grupo_nat_completo",
-            index=1  # Default: Atividade (3)
-        )
-        
         # Número do Projeto/Atividade
         opcoes_num_projeto = [(cod, f"{cod} - {nome}") for cod, nome in sorted(projetos_disponiveis.items())]
         num_projeto_selecionado = st.selectbox(
@@ -322,8 +312,65 @@ else:
             key="num_projeto_completo"
         )
     
-    # ===== COMPONENTES AVANÇADOS (só no modo avançado) =====
-    if modo_avancado:
+    # ===== MODO DE ELEMENTO DE DESPESA =====
+    st.markdown("---")
+    st.markdown("### 💰 Elemento de Despesa")
+    
+    modo_elemento = st.radio(
+        "Modo de seleção",
+        options=["Simplificado", "Completo"],
+        horizontal=True,
+        help="Simplificado: código completo pronto. Completo: preencher cada campo separadamente."
+    )
+    
+    if modo_elemento == "Simplificado":
+        # Modo simplificado: apenas o elemento completo
+        opcoes_elemento_simp = audesp_codes.obter_opcoes_elemento_simplificado()
+        elemento_completo_selecionado = st.selectbox(
+            "Elemento de Despesa (Código Completo)",
+            options=[cod for cod, _ in opcoes_elemento_simp],
+            format_func=lambda x: next(label for cod, label in opcoes_elemento_simp if cod == x),
+            key="elemento_simplificado",
+            help="Código completo no formato Cat.Grupo.Mod.Elem.Desdobr"
+        )
+        
+        # Extrair componentes do código completo
+        # Formato: 3.1.90.11.00 = Cat.Grupo.Mod.Elem.Desdobr
+        partes = elemento_completo_selecionado.split(".")
+        cat_econ_selecionada = partes[0]
+        grupo_desp_selecionado = partes[1]
+        modalidade_selecionada = partes[2]
+        elemento_selecionado = partes[3]
+        desdobramento = ".".join(partes[4:]) if len(partes) > 4 else "00"
+        
+        # Valores padrão para fonte e aplicação
+        fonte_selecionada = "01"  # Tesouro
+        aplicacao_selecionada = list(aplicacoes_disponiveis.keys())[0] if aplicacoes_disponiveis else "0000"
+        
+        # Mostrar fonte e aplicação
+        col_fonte, col_aplic = st.columns(2)
+        with col_fonte:
+            opcoes_fonte = audesp_codes.obter_opcoes_fonte()
+            fonte_selecionada = st.selectbox(
+                "Fonte de Recursos",
+                options=[cod for cod, _ in opcoes_fonte],
+                format_func=lambda x: next(label for cod, label in opcoes_fonte if cod == x),
+                key="fonte_simplificado"
+            )
+        with col_aplic:
+            opcoes_aplicacao = [(cod, f"{cod} - {nome}") for cod, nome in sorted(aplicacoes_disponiveis.items())]
+            aplicacao_selecionada = st.selectbox(
+                "Aplicação",
+                options=[cod for cod, _ in opcoes_aplicacao],
+                format_func=lambda x: next(label for cod, label in opcoes_aplicacao if cod == x),
+                key="aplicacao_simplificado"
+            )
+        
+        # Grupo de natureza fixo (Atividade)
+        grupo_nat_selecionado = "3"
+        
+    else:
+        # Modo completo: todos os campos individuais
         st.markdown("---")
         st.markdown("### 🔬 Natureza da Despesa")
         
