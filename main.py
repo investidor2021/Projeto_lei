@@ -593,6 +593,7 @@ if opcoes_planilha:
 
     with col3:
         st.markdown("<br>", unsafe_allow_html=True)
+        adicionar = st.button("➕ Adicionar Anulação", use_container_width=True)
         if st.button("Adicionar Anulação"):
             if item_a:
                 novo = {**item_a, "valor": valor_a}
