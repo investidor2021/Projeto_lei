@@ -460,8 +460,21 @@ else:
         aplicacao_selecionada
     )
     
-    # Obter descrição automática
-    descricao_auto = audesp_codes.obter_descricao_completa_detalhada(dotacao_completa)
+    # Obter nome do elemento e departamento para descrição
+    if modo_elemento == "Simplificado":
+        # Extrair nome do elemento do código completo
+        elemento_nome = next((nome for cod, nome in audesp_codes.obter_opcoes_elemento_simplificado() if cod == elemento_completo_selecionado), "")
+        # Remover o código do início
+        elemento_nome = elemento_nome.split(" - ", 1)[1] if " - " in elemento_nome else elemento_nome
+    else:
+        # Buscar nome do elemento
+        elemento_nome = audesp_codes.ELEMENTOS_DESPESA_DETALHADOS.get(elemento_selecionado, "")
+    
+    # Buscar nome do departamento
+    depto_nome = audesp_codes.DEPARTAMENTOS.get(depto_selecionado, "")
+    
+    # Montar descrição no formato DOCX
+    descricao_docx = f"{dotacao_completa} - {elemento_nome} - {depto_nome}"
     
     # Exibir o código completo e descrição
     st.markdown("---")
@@ -469,7 +482,7 @@ else:
     st.code(dotacao_completa, language="text")
     
     st.markdown("**📝 Descrição:**")
-    st.info(descricao_auto)
+    st.info(descricao_docx)
     
     # Botão para recarregar dados da planilha
     if st.button("🔄 Recarregar Projetos e Aplicações"):
@@ -491,8 +504,8 @@ else:
     
     if adicionar:
         item_manual = {
-            "label": f"{dotacao_completa} - {descricao_auto}",
-            "label_docx": f"{dotacao_completa} - {descricao_auto}",
+            "label": descricao_docx,
+            "label_docx": descricao_docx,
             "id": f"manual-{uuid.uuid4()}",
             "ficha": dotacao_completa,
             "valor": valor
