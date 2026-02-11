@@ -381,8 +381,19 @@ FONTES_RECURSOS = {
 # APLICAÇÕES (Códigos de Aplicação do Município)
 # ===============================
 APLICACOES = {
-    # GERAL
-    "0000": "Geral",
+    # GERAL (100-199)
+    "0100": "Geral Total",
+    "0110": "Geral",
+    "0111": "Remuneração de Aplicações Financeiras",
+    "0112": "Recursos Lei Complementar nº 194/2022",
+    "0113": "Cessão de Direitos Creditórios",
+    "0120": "Alienação de Bens",
+    "0121": "Remuneração de Aplicações Financeiras",
+    "0130": "CIDE - Contribuição de Intervenção no Domínio Econômico",
+    "0131": "Remuneração de Aplicações Financeiras",
+    "0140": "Royalties da Exploração do Petróleo e Gás Natural",
+    "0141": "Remuneração de Aplicações Financeiras",
+    "0190": "Movimentações Extraorçamentárias Geral",
     
     # EDUCAÇÃO (200-299)
     "0200": "Educação",

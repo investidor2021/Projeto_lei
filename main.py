@@ -324,15 +324,36 @@ else:
     )
     
     if modo_elemento == "Simplificado":
-        # Modo simplificado: apenas o elemento completo
-        opcoes_elemento_simp = audesp_codes.obter_opcoes_elemento_simplificado()
-        elemento_completo_selecionado = st.selectbox(
-            "Elemento de Despesa (Código Completo)",
-            options=[cod for cod, _ in opcoes_elemento_simp],
-            format_func=lambda x: next(label for cod, label in opcoes_elemento_simp if cod == x),
-            key="elemento_simplificado",
-            help="Código completo no formato Cat.Grupo.Mod.Elem.Desdobr"
-        )
+        # Modo simplificado: elemento, fonte e aplicação em 3 colunas
+        col_elem, col_fonte, col_aplic = st.columns(3)
+        
+        with col_elem:
+            opcoes_elemento_simp = audesp_codes.obter_opcoes_elemento_simplificado()
+            elemento_completo_selecionado = st.selectbox(
+                "Elemento de Despesa (Código Completo)",
+                options=[cod for cod, _ in opcoes_elemento_simp],
+                format_func=lambda x: next(label for cod, label in opcoes_elemento_simp if cod == x),
+                key="elemento_simplificado",
+                help="Código completo no formato Cat.Grupo.Mod.Elem.Desdobr"
+            )
+        
+        with col_fonte:
+            opcoes_fonte = audesp_codes.obter_opcoes_fonte()
+            fonte_selecionada = st.selectbox(
+                "Fonte de Recursos",
+                options=[cod for cod, _ in opcoes_fonte],
+                format_func=lambda x: next(label for cod, label in opcoes_fonte if cod == x),
+                key="fonte_simplificado"
+            )
+        
+        with col_aplic:
+            opcoes_aplicacao = audesp_codes.obter_opcoes_aplicacao()
+            aplicacao_selecionada = st.selectbox(
+                "Código Aplicação",
+                options=[cod for cod, _ in opcoes_aplicacao],
+                format_func=lambda x: next(label for cod, label in opcoes_aplicacao if cod == x),
+                key="aplicacao_simplificado"
+            )
         
         # Extrair componentes do código completo
         # Formato: 3.1.90.11.00 = Cat.Grupo.Mod.Elem.Desdobr
@@ -342,29 +363,6 @@ else:
         modalidade_selecionada = partes[2]
         elemento_selecionado = partes[3]
         desdobramento = ".".join(partes[4:]) if len(partes) > 4 else "00"
-        
-        # Valores padrão para fonte e aplicação
-        fonte_selecionada = "01"  # Tesouro
-        aplicacao_selecionada = list(aplicacoes_disponiveis.keys())[0] if aplicacoes_disponiveis else "0000"
-        
-        # Mostrar fonte e aplicação
-        col_fonte, col_aplic = st.columns(2)
-        with col_fonte:
-            opcoes_fonte = audesp_codes.obter_opcoes_fonte()
-            fonte_selecionada = st.selectbox(
-                "Fonte de Recursos",
-                options=[cod for cod, _ in opcoes_fonte],
-                format_func=lambda x: next(label for cod, label in opcoes_fonte if cod == x),
-                key="fonte_simplificado"
-            )
-        with col_aplic:
-            opcoes_aplicacao = [(cod, f"{cod} - {nome}") for cod, nome in sorted(aplicacoes_disponiveis.items())]
-            aplicacao_selecionada = st.selectbox(
-                "Aplicação",
-                options=[cod for cod, _ in opcoes_aplicacao],
-                format_func=lambda x: next(label for cod, label in opcoes_aplicacao if cod == x),
-                key="aplicacao_simplificado"
-            )
         
         # Grupo de natureza fixo (Atividade)
         grupo_nat_selecionado = "3"
