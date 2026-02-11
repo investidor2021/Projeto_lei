@@ -225,14 +225,7 @@ PROGRAMAS = {
     "0036": "UNIFORME ESCOLAR"
 }
 
-# ===============================
-# GRUPOS DE NATUREZA (Tipo de Ação)
-# ===============================
-GRUPOS_NATUREZA = {
-    "2": "Projeto",
-    "3": "Atividade",
-    "4": "Operação Especial"
-}
+# GRUPOS DE NATUREZA removidos - não são mais necessários
 
 # ===============================
 # CATEGORIAS ECONÔMICAS
@@ -291,9 +284,49 @@ MODALIDADES_APLICACAO = {
 }
 
 # ===============================
-# ELEMENTOS DE DESPESA (Mais Utilizados pelo Município)
+# ELEMENTOS DE DESPESA SIMPLIFICADOS (Código Completo)
+# Formato: Cat.Grupo.Modalidade.Elemento.Desdobramento
 # ===============================
-ELEMENTOS_DESPESA = {
+ELEMENTOS_DESPESA_SIMPLIFICADOS = {
+    "3.1.90.04.00": "Contratação por Tempo Determinado",
+    "3.1.90.11.00": "Vencimentos e Vantagens Fixas - Pessoal Civil",
+    "3.1.90.13.00": "Obrigações Patronais",
+    "3.1.91.13.00": "Obrigações Patronais",
+    "3.1.90.16.00": "Outras Despesas Variáveis - Pessoal Civil",
+    "3.1.71.70.00": "Rateio pela Participação em Consórcio Público",
+    "3.2.90.21.00": "Juros sobre a Dívida por Contrato",
+    "3.3.90.08.00": "Outros Benefícios Assistenciais do Servidor e do Militar",
+    "3.3.90.14.00": "Diárias - Civil",
+    "3.3.90.18.00": "Auxílio Financeiro a Estudante",
+    "3.3.90.30.00": "Material de Consumo",
+    "3.3.50.30.00": "Material de Consumo",
+    "3.3.90.32.00": "Material, Bem ou Serviço para Distribuição Gratuita",
+    "3.3.90.35.00": "Serviços de Consultoria",
+    "3.3.90.36.00": "Outros Serviços de Terceiros - Pessoa Física",
+    "3.3.90.39.00": "Outros Serviços de Terceiros - Pessoa Jurídica",
+    "3.3.50.39.00": "Outros Serviços de Terceiros - Pessoa Jurídica",
+    "3.3.90.40.00": "Serviços de Tecnologia da Informação e Comunicação - Pessoa Jurídica",
+    "3.3.90.46.00": "Auxílio-Alimentação",
+    "3.3.90.47.00": "Obrigações Tributárias e Contributivas",
+    "3.3.90.91.00": "Sentenças Judiciais",
+    "3.3.90.92.00": "Despesas de Exercícios Anteriores",
+    "3.3.90.93.00": "Indenizações e Restituições",
+    "3.3.71.70.00": "Rateio pela Participação em Consórcio Público",
+    "4.4.90.51.00": "Obras e Instalações",
+    "4.4.50.51.00": "Obras e Instalações",
+    "4.4.90.52.00": "Equipamentos e Material Permanente",
+    "4.4.50.52.00": "Equipamentos e Material Permanente",
+    "4.4.90.61.00": "Aquisição de Imóveis",
+    "4.4.90.93.00": "Indenizações e Restituições",
+    "4.6.90.71.00": "Principal da Dívida Contratual Resgatado",
+    "9.9.99.99.00": "Reserva de Contingência"
+}
+
+# ===============================
+# ELEMENTOS DE DESPESA DETALHADOS (Apenas Elemento)
+# Para uso no modo avançado
+# ===============================
+ELEMENTOS_DESPESA_DETALHADOS = {
     "04": "Contratação por Tempo Determinado",
     "08": "Outros Benefícios Assistenciais do Servidor e do Militar",
     "11": "Vencimentos e Vantagens Fixas - Pessoal Civil",
@@ -535,8 +568,8 @@ def obter_opcoes_programa():
     return [(cod, f"{cod} - {nome}") for cod, nome in sorted(PROGRAMAS.items())]
 
 def obter_opcoes_grupo_natureza():
-    """Retorna lista formatada para selectbox do Streamlit."""
-    return [(cod, f"{cod} - {nome}") for cod, nome in sorted(GRUPOS_NATUREZA.items())]
+    """DEPRECATED - Grupos de natureza foram removidos."""
+    return []
 
 def obter_opcoes_categoria_economica():
     """Retorna lista formatada para selectbox do Streamlit."""
@@ -550,9 +583,13 @@ def obter_opcoes_modalidade():
     """Retorna lista formatada para selectbox do Streamlit."""
     return [(cod, f"{cod} - {nome}") for cod, nome in sorted(MODALIDADES_APLICACAO.items())]
 
-def obter_opcoes_elemento():
-    """Retorna lista formatada para selectbox do Streamlit."""
-    return [(cod, f"{cod} - {nome}") for cod, nome in sorted(ELEMENTOS_DESPESA.items())]
+def obter_opcoes_elemento_simplificado():
+    """Retorna lista formatada de elementos SIMPLIFICADOS (código completo) para selectbox."""
+    return [(cod, f"{cod} - {nome}") for cod, nome in sorted(ELEMENTOS_DESPESA_SIMPLIFICADOS.items())]
+
+def obter_opcoes_elemento_detalhado():
+    """Retorna lista formatada de elementos DETALHADOS (apenas elemento) para selectbox."""
+    return [(cod, f"{cod} - {nome}") for cod, nome in sorted(ELEMENTOS_DESPESA_DETALHADOS.items())]
 
 def obter_opcoes_fonte():
     """Retorna lista formatada para selectbox do Streamlit."""
