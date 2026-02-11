@@ -441,15 +441,9 @@ else:
             format_func=lambda x: next(label for cod, label in opcoes_aplicacao if cod == x),
             key="aplicacao_completo"
         )
-    else:
-        # Valores padrão para modo simplificado
-        cat_econ_selecionada = "3"  # Despesas Correntes
-        grupo_desp_selecionado = "1"  # Pessoal e Encargos Sociais
-        modalidade_selecionada = "90"  # Aplicações Diretas
-        elemento_selecionado = "11"  # Vencimentos
-        desdobramento = "00.00.00.00.00"
-        fonte_selecionada = "00"  # Recursos Ordinários
-        aplicacao_selecionada = list(aplicacoes_disponiveis.keys())[0] if aplicacoes_disponiveis else "0001"
+        
+        # Grupo de natureza fixo (Atividade)
+        grupo_nat_selecionado = "3"
     
     # Compor o código completo
     dotacao_completa = audesp_codes.compor_dotacao_completa(
