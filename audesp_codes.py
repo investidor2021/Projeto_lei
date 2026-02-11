@@ -619,21 +619,20 @@ def obter_opcoes_aplicacao():
     """Retorna lista formatada para selectbox do Streamlit."""
     return [(cod, f"{cod} - {nome}") for cod, nome in sorted(APLICACOES.items())]
 
-def compor_dotacao_completa(depto, funcao, subfuncao, programa, grupo_nat, num_projeto,
+def compor_dotacao_completa(depto, funcao, subfuncao, programa, num_projeto,
                             cat_econ, grupo_desp, modalidade, elemento, desdobramento,
                             fonte, aplicacao):
     """
     Compõe o código COMPLETO da dotação orçamentária AUDESP.
     
-    Estrutura: XX.XX.XX.XX.XXX.XXXX.X.XXX.X.X.XX.XX.XX.XX.XX.XX.XX.XX.XXXX
+    Estrutura: XX.XX.XX.XX.XXX.XXXX.XXXX.X.X.XX.XX.XX.XX.XX.XX.XX.XX.XXXX
     
     Args:
         depto: Departamento (ex: "01.02.16")
         funcao: Função (ex: "12")
         subfuncao: Subfunção (ex: "361")
         programa: Programa (ex: "0013")
-        grupo_nat: Grupo de Natureza - Tipo (ex: "2" para Projeto, "3" para Atividade)
-        num_projeto: Número do Projeto/Atividade (ex: "126")
+        num_projeto: Número do Projeto/Atividade (ex: "2126")
         cat_econ: Categoria Econômica (ex: "3" para Corrente, "4" para Capital)
         grupo_desp: Grupo de Despesa (ex: "1" para Pessoal)
         modalidade: Modalidade de Aplicação (ex: "90" para Aplicações Diretas)
@@ -646,15 +645,12 @@ def compor_dotacao_completa(depto, funcao, subfuncao, programa, grupo_nat, num_p
         String com o código completo
         Ex: "01.02.16.12.361.0013.2126.3.1.90.11.00.00.00.00.00.02.0265"
     """
-    # Compor o número completo do projeto/atividade (tipo + número)
-    projeto_completo = f"{grupo_nat}{num_projeto}"
-    
     # Garantir que desdobramento tenha o formato correto (5 partes de 2 dígitos)
     if not desdobramento or desdobramento == "00":
         desdobramento = "00.00.00.00.00"
     
-    # Compor o código completo
-    codigo = (f"{depto}.{funcao}.{subfuncao}.{programa}.{projeto_completo}."
+    # Compor o código completo (sem grupo_nat)
+    codigo = (f"{depto}.{funcao}.{subfuncao}.{programa}.{num_projeto}."
              f"{cat_econ}.{grupo_desp}.{modalidade}.{elemento}.{desdobramento}."
              f"{fonte}.{aplicacao}")
     

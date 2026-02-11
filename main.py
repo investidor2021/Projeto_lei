@@ -502,7 +502,6 @@ else:
         funcao_selecionada,
         subfuncao_selecionada,
         programa_selecionado,
-        grupo_nat_selecionado,
         num_projeto_selecionado,
         cat_econ_selecionada,
         grupo_desp_selecionado,
