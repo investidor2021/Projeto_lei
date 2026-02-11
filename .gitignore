@@ -39,6 +39,10 @@ env/
 # Credentials (IMPORTANTE: nunca commitar credenciais!)
 credenciais.json
 *.json.secret
+secrets.toml.example
+secrets_alternative.toml
+secrets.toml
+.streamlit/secrets.toml
 
 # OS
 .DS_Store
