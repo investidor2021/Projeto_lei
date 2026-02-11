@@ -273,7 +273,7 @@ else:
     # ===== COMPONENTES PRINCIPAIS (sempre visíveis) =====
     st.markdown("### 📋 Componentes Principais")
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         # Departamento
@@ -285,14 +285,7 @@ else:
             key="depto_completo"
         )
         
-        # Função
-        opcoes_funcao = audesp_codes.obter_opcoes_funcao()
-        funcao_selecionada = st.selectbox(
-            "Função",
-            options=[cod for cod, _ in opcoes_funcao],
-            format_func=lambda x: next(label for cod, label in opcoes_funcao if cod == x),
-            key="funcao_completo"
-        )
+        
     
     with col2:
         # Subfunção
@@ -312,8 +305,16 @@ else:
             format_func=lambda x: next(label for cod, label in opcoes_programa if cod == x),
             key="programa_completo"
         )
-    
     with col3:
+        # Função
+        opcoes_funcao = audesp_codes.obter_opcoes_funcao()
+        funcao_selecionada = st.selectbox(
+            "Função",
+            options=[cod for cod, _ in opcoes_funcao],
+            format_func=lambda x: next(label for cod, label in opcoes_funcao if cod == x),
+            key="funcao_completo"
+        )
+    with col4:
         # Número do Projeto/Atividade com opção manual
         modo_projeto = st.radio(
             "Projeto/Atividade",
