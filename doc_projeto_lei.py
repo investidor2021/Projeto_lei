@@ -15,7 +15,7 @@ import os
 def add_coat_of_arms(doc):
     """Adiciona o brasão e cabeçalho oficial no documento."""
     # Caminho para o brasão
-    brasao_path = os.path.join(os.path.dirname(__file__), "assets", "brasao.png")
+    brasao_path = os.path.join(os.path.dirname(__file__), "assets", "brasao.jpg")
     
     # Adicionar brasão centralizado
     p_brasao = doc.add_paragraph()
@@ -23,30 +23,8 @@ def add_coat_of_arms(doc):
     run = p_brasao.add_run()
     run.add_picture(brasao_path, width=Cm(4.5))  # Ajustar tamanho conforme necessário
     
-    # PREFEITURA MUNICIPAL (itálico)
-    p = doc.add_paragraph("PREFEITURA MUNICIPAL")
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.runs[0].italic = True
-    p.runs[0].font.size = Pt(14)
-    p.runs[0].font.name = 'Times New Roman'
+     
     
-    # Vargem Grande do Sul - SP (itálico)
-    p = doc.add_paragraph("Vargem Grande do Sul - SP")
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.runs[0].italic = True
-    p.runs[0].font.size = Pt(14)
-    p.runs[0].font.name = 'Times New Roman'
-    
-    # "A Pérola da Mantiqueira" (itálico, entre aspas)
-    p = doc.add_paragraph('"A Pérola da Mantiqueira"')
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.runs[0].italic = True
-    p.runs[0].font.size = Pt(12)
-    p.runs[0].font.name = 'Times New Roman'
-    
-    doc.add_paragraph()  # Espaço
-
-
 def classify_expense_type(itens_credito):
     """
     Classifica as despesas em 'de capital', 'de custeio' ou ambas.
@@ -109,7 +87,7 @@ def gerar_projeto_lei(dados):
     p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
     
-    doc.add_paragraph()  # Espaço
+    #doc.add_paragraph()  # Espaço
 
     # ---------------------------------------------------------
     # PREÂMBULO
@@ -119,14 +97,14 @@ def gerar_projeto_lei(dados):
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
-    doc.add_paragraph()
+    #doc.add_paragraph()
     
     p = doc.add_paragraph("Faço saber que a Câmara Municipal decreta e eu sanciono a seguinte Lei:")
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
-    doc.add_paragraph()
+    #doc.add_paragraph()
 
     # ---------------------------------------------------------
     # ARTIGO 1º
@@ -146,7 +124,7 @@ def gerar_projeto_lei(dados):
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
-    doc.add_paragraph()  # Espaço antes da tabela
+    #doc.add_paragraph()  # Espaço antes da tabela
 
     # ---------------------------------------------------------
     # TABELA DE DOTAÇÕES (formato: código - elemento - departamento)
@@ -188,7 +166,7 @@ def gerar_projeto_lei(dados):
         for idx, width in enumerate(widths):
             row.cells[idx].width = width
         
-    doc.add_paragraph()
+    #doc.add_paragraph()
     
     # Total
     p = doc.add_paragraph(f"Total {format_currency(dados['total_credito'])}")
@@ -197,7 +175,7 @@ def gerar_projeto_lei(dados):
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
-    doc.add_paragraph()
+    #doc.add_paragraph()
 
     # ---------------------------------------------------------
     # ARTIGO 2º - FONTES (EXCESSO OU SUPERÁVIT)
@@ -239,7 +217,7 @@ def gerar_projeto_lei(dados):
         p.paragraph_format.first_line_indent = Cm(1.27)
         p.runs[0].font.name = 'Times New Roman'
         p.runs[0].font.size = Pt(12)
-        doc.add_paragraph()
+        #doc.add_paragraph()
         art_num += 1
 
     # Se houver ANULAÇÃO
@@ -284,7 +262,7 @@ def gerar_projeto_lei(dados):
             for idx, width in enumerate(widths):
                 row.cells[idx].width = width
                 
-        doc.add_paragraph()
+        #doc.add_paragraph()
         art_num += 1
 
     # ---------------------------------------------------------
@@ -301,7 +279,7 @@ def gerar_projeto_lei(dados):
     p.paragraph_format.first_line_indent = Cm(1.27)
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
-    doc.add_paragraph()
+    #doc.add_paragraph()
     art_num += 1
 
     # ---------------------------------------------------------
@@ -312,7 +290,7 @@ def gerar_projeto_lei(dados):
     p.paragraph_format.first_line_indent = Cm(1.27)
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
-    doc.add_paragraph()
+    #doc.add_paragraph()
 
     # ---------------------------------------------------------
     # DATA E ASSINATURA
