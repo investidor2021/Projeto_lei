@@ -114,6 +114,15 @@ with f2:
     usa_exc = st.checkbox("Excesso de Arrecadação")
     val_exc = st.number_input("Valor Excesso", min_value=0.0, disabled=not usa_exc, format="%.2f")
 
+# Campo de origem para excesso de arrecadação
+origem_recursos = ""
+if usa_exc and val_exc > 0:
+    origem_recursos = st.text_input(
+        "Origem dos Recursos",
+        placeholder="Ex: Proposta nº 63000724740202600, destinada ao custeio...",
+        help="Informe a origem específica (proposta, convênio, etc.)"
+    )
+
 # ===============================
 # PLANILHA
 # ===============================
@@ -599,6 +608,7 @@ if st.button("Gerar DOCX"):
             "ldo": ldo,
             "val_sup": val_sup,
             "val_exc": val_exc,
+            "origem_recursos": origem_recursos,
             "itens_credito": st.session_state.itens_credito,
             "itens_anulacao": st.session_state.itens_anulacao,
             "total_credito": total_credito,
