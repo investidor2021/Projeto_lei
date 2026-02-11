@@ -219,7 +219,7 @@ if tipo_lei == "Suplementar":
 
     with col3:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("Adicionar Crédito", use_container_width=True):
+        if st.button("➕ Adicionar Crédito", use_container_width=True):
             if item:
                 novo = {**item, "valor": valor}
                 st.session_state.itens_credito.append(novo)
@@ -593,8 +593,8 @@ if opcoes_planilha:
 
     with col3:
         st.markdown("<br>", unsafe_allow_html=True)
-        adicionar = st.button("➕ Adicionar Anulação", use_container_width=True)
-        if st.button("Adicionar Anulação"):
+        
+        if st.button("➕ Adicionar Anulação", use_container_width=True):
             if item_a:
                 novo = {**item_a, "valor": valor_a}
                 st.session_state.itens_anulacao.append(novo)
