@@ -228,7 +228,7 @@ if tipo_lei == "Suplementar":
                 st.warning("Selecione uma ficha válida para crédito.")
 
 else:
-    st.subheader("Crédito Especial - Construtor Completo de Dotação AUDESP")
+    #st.subheader("Crédito Especial - Construtor Completo de Dotação AUDESP")
     
     # Importar o módulo de códigos AUDESP
     import audesp_codes
@@ -263,10 +263,10 @@ else:
         }
     
     # Toggle para modo avançado
-    modo_avancado = st.checkbox("🔧 Modo Avançado (mostrar todos os componentes)", value=False)
+    #modo_avancado = st.checkbox("🔧 Modo Avançado (mostrar todos os componentes)", value=False)
     
-    if not modo_avancado:
-        st.info("💡 **Modo Simplificado**: Preencha apenas os componentes principais. Os demais usarão valores padrão.")
+    #if not modo_avancado:
+    #    st.info("💡 **Modo Simplificado**: Preencha apenas os componentes principais. Os demais usarão valores padrão.")
     
     st.markdown("---")
     
