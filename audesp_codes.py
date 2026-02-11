@@ -674,15 +674,8 @@ def obter_descricao_completa_detalhada(codigo_completo):
     if len(partes) >= 6 and partes[5] in PROGRAMAS:
         descricoes.append(f"Programa: {PROGRAMAS[partes[5]]}")
     
-    # Projeto/Atividade (parte 6) - primeiro dígito é o tipo
-    if len(partes) >= 7 and len(partes[6]) > 0:
-        tipo = partes[6][0]
-        if tipo in GRUPOS_NATUREZA:
-            descricoes.append(f"Tipo: {GRUPOS_NATUREZA[tipo]}")
-    
-    # Elemento de Despesa (parte 10)
-    if len(partes) >= 11 and partes[10] in ELEMENTOS_DESPESA:
-        descricoes.append(f"Elemento: {ELEMENTOS_DESPESA[partes[10]]}")
+    # Projeto/Atividade (parte 6) - grupos de natureza foram removidos
+    # Elemento de Despesa (parte 10) - usar elementos simplificados
     
     # Fonte de Recursos (parte 17 ou penúltima)
     if len(partes) >= 18 and partes[17] in FONTES_RECURSOS:
