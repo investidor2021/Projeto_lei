@@ -1,0 +1,337 @@
+import streamlit as st
+import pandas as pd
+import uuid
+
+from doc_projeto_lei import gerar_projeto_lei
+from doc_decreto import gerar_decreto
+from doc_lei_final import gerar_lei_final
+
+# ===============================
+# CONFIGURAÇÃO INICIAL
+# ===============================
+st.set_page_config(page_title="Gerador Legislativo", layout="wide")
+st.title("🏛️ Gerador de Projetos, Leis e Decretos")
+
+import sheets_client  # [NEW] Importação do client do Sheets
+
+if "itens_credito" not in st.session_state:
+    st.session_state.itens_credito = []
+if "itens_anulacao" not in st.session_state:
+    st.session_state.itens_anulacao = []
+
+def abreviar_texto(texto):
+    """Abrevia termos comuns para caber melhor no documento."""
+    substituicoes = {
+        "MANUTENÇÃO": "Manut.",
+        "DESENVOLVIMENTO": "Desenv.",        
+        "EDUCAÇÃO": "Educ.",
+        "DEPARTAMENTO": "Depto.",
+        "ENCARGOS": "Enc.",
+        "SERVIÇOS": "Serv.",
+        "INFRAESTRUTURA": "Infra.",
+        "ADMINISTRAÇÃO": "Adm.",
+        "SERVIÇOS":"Serv.",
+        "TERCEIROS":"Terc.",
+        "PESSOA FÍSICA":"PF",
+        "PESSOA JURÍDICA":"PJ",
+        "MATERIAL DE CONSUMO":"Mat. Cons.",
+        "OUTROS BENEFÍCIOS ASSISTENCIAIS DO SERVIDOR E DO MILITAR":"Outros Ben. Assist. Serv. e Mil.",
+        "VENCIMENTOS E VANTAGENS FIXAS - PESSOAL CIVIL":"Venc. e Vant. - P Civil",
+        "DE":"de"
+
+
+    }
+    for original, abreviado in substituicoes.items():
+        texto = texto.replace(original, abreviado)
+    return texto
+
+# ===============================
+# FUNÇÕES AUXILIARES
+# ===============================
+def processar_planilha(file):
+    df = pd.read_csv(file) if file.name.endswith(".csv") else pd.read_excel(file)
+    df = df.iloc[1:].reset_index(drop=True)  # pula a primeira linha
+
+    options = []
+    for idx, row in df.iterrows():
+        ficha = str(row.iloc[2]).strip()
+        descricao = str(row.iloc[0]).strip()
+        depto = str(row.iloc[1]).strip()
+        nomedespesa = str(row.iloc[4]).strip()
+        numdespesa = str(row.iloc[3]).strip()
+        fonte = str(row.iloc[6]).strip()
+        aplicacao = str(row.iloc[14]).strip()
+        
+        label = f"Ficha: {ficha} - {descricao} {numdespesa}.0{fonte}.{aplicacao} - {abreviar_texto(nomedespesa)} - {abreviar_texto(depto)}"
+    
+        
+        options.append({
+            "label": label,
+            "label_docx": label,
+            "id": f"{ficha}-{idx}",
+            "ficha": ficha,
+            "valor": 0.0
+        })
+    return options
+    
+    
+
+def descricao_automatica(dotacao):
+    # Versão inicial simples (depois você pode sofisticar)
+    return f"Nova dotação criada automaticamente para {dotacao}"
+
+# ===============================
+# IDENTIFICAÇÃO
+# ===============================
+with st.expander("📄 1. Identificação", expanded=True):
+    c1, c2, c3 = st.columns(3)
+
+    tipo_doc = c1.radio("Tipo do Documento", ["Projeto de Lei", "Lei Finalizada", "Decreto"], horizontal=True)
+    tipo_lei = c2.radio("Tipo de Crédito", ["Suplementar", "Especial"], horizontal=True)
+
+    numero = c1.text_input("Número", placeholder="Ex: 10/2026")
+    municipio = c2.text_input("Município", "Vargem Grande do Sul")
+    prefeito = c3.text_input("Prefeito", "CELSO LUIS RIBEIRO")
+
+    ppa = c1.text_input("PPA", "Lei nº 4.598/2021")
+    ldo = c2.text_input("LDO", "Lei nº 4.998/2024")
+
+# ===============================
+# FONTES DE RECURSO
+# ===============================
+st.header("💰 2. Fontes de Recurso")
+f1, f2 = st.columns(2)
+
+with f1:
+    usa_sup = st.checkbox("Superávit Financeiro")
+    val_sup = st.number_input("Valor Superávit", min_value=0.0, disabled=not usa_sup, format="%.2f")
+
+with f2:
+    usa_exc = st.checkbox("Excesso de Arrecadação")
+    val_exc = st.number_input("Valor Excesso", min_value=0.0, disabled=not usa_exc, format="%.2f")
+
+# ===============================
+# PLANILHA
+# ===============================
+# ===============================
+# PLANILHA (Carregamento Automático)
+# ===============================
+
+# Se não estiver no session state, tenta carregar automaticamente
+if "df_planilha" not in st.session_state:
+    DEFAULT_SHEET_ID = "1EJN2eziO3rpv2KFavAMIJbD7UQyZZOChGLXt81VTHww"
+    with st.spinner("Conectando automaticamente ao Google Sheets..."):
+        df = sheets_client.get_data_from_sheets(DEFAULT_SHEET_ID, "dotacao")
+        if df is not None:
+             st.session_state["df_planilha"] = df
+             st.success("Planilha carregada automaticamente!")
+        else:
+             st.error("Falha ao carregar planilha automaticamente. Verifique as credenciais.")
+
+# Recupera do session state
+df_planilha = st.session_state.get("df_planilha", None)
+
+if st.button("🔄 Recarregar Dados da Planilha"):
+    DEFAULT_SHEET_ID = "1EJN2eziO3rpv2KFavAMIJbD7UQyZZOChGLXt81VTHww"
+    with st.spinner("Recarregando..."):
+        df = sheets_client.get_data_from_sheets(DEFAULT_SHEET_ID, "dotacao")
+        if df is not None:
+             st.session_state["df_planilha"] = df
+             st.rerun()
+
+# Lógica de processamento comum (adaptada para usar o DF já carregado)
+def processar_dataframe(df):
+    options = []
+    for idx, row in df.iterrows():
+        # Adaptação para garantir que acessamos as colunas corretas pelo índice
+        # O código original usava iloc com índices fixos. Vamos manter, assumindo que a estrutura da planilha online é igual.
+        try:
+            ficha = str(row.iloc[2]).strip()
+            descricao = str(row.iloc[0]).strip()
+            depto = str(row.iloc[1]).strip()
+            nomedespesa = str(row.iloc[4]).strip()
+            numdespesa = str(row.iloc[3]).strip()
+            fonte = str(row.iloc[6]).strip()
+            aplicacao = str(row.iloc[14]).strip()
+            
+            label = f"Ficha: {ficha} - {descricao} {numdespesa}.0{fonte}.{aplicacao} - {abreviar_texto(nomedespesa)} - {abreviar_texto(depto)}"
+        
+            options.append({
+                "label": label,
+                "label_docx": label,
+                "id": f"{ficha}-{idx}",
+                "ficha": ficha,
+                "valor": 0.0,
+                # Campos brutos para o DOCX
+                "descricao": descricao,
+                "depto": depto,
+                "nomedespesa": nomedespesa,
+                "numdespesa": numdespesa,
+                "fonte": fonte,
+                "aplicacao": aplicacao
+            })
+        except Exception as e:
+            # Caso a linha esteja vazia ou incompleta
+            continue
+            
+    return options
+
+opcoes_planilha = []
+if df_planilha is not None:
+    todas = processar_dataframe(df_planilha)
+    usados = st.session_state.itens_credito + st.session_state.itens_anulacao
+    
+    # Função auxiliar local, duplicada pois a original estava dentro de um if
+    def filtrar_opcoes_livres(opcoes, usados):
+        usados_ids = {i["id"] for i in usados}
+        return [o for o in opcoes if o["id"] not in usados_ids]
+        
+    opcoes_planilha = filtrar_opcoes_livres(todas, usados)
+
+# ===============================
+# CRÉDITO
+# ===============================
+st.header("➕ 3. Crédito")
+
+if tipo_lei == "Suplementar":
+    st.subheader("Crédito por ficha da planilha")
+
+    col1, col2= st.columns([5,1])
+
+    with col1:
+        item = st.selectbox("Escolha a ficha", options=opcoes_planilha, format_func=lambda x: x["label"])
+
+    with col2:
+        valor = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_credito")
+
+    if st.button("Adicionar Crédito"):
+        if item:
+            novo = {**item, "valor": valor}
+            st.session_state.itens_credito.append(novo)
+            st.success("Crédito adicionado!")
+        else:
+            st.warning("Selecione uma ficha válida para crédito.")
+
+else:
+    st.subheader("Crédito Especial (criação manual)")
+
+    dotacao = st.text_input("Digite a nova dotação", placeholder="01.02.01.04.122.0002.2003")
+    descricao = descricao_automatica(dotacao)
+    st.text_input("Descrição (automática)", descricao, disabled=True)
+
+    valor = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_credito_manual")
+
+    if st.button("Adicionar Crédito Especial"):
+        item_manual = {
+            "label": f"{dotacao} - {descricao}",
+            "label_docx": f"{dotacao} - {descricao}",
+            "id": f"manual-{uuid.uuid4()}",
+            "ficha": dotacao,
+            "valor": valor
+        }
+        st.session_state.itens_credito.append(item_manual)
+        st.success("Crédito especial criado!")
+
+# ===============================
+# ANULAÇÃO (sempre pela planilha)
+# ===============================
+st.header("➖ 4. Anulação (sempre pela planilha)")
+
+if opcoes_planilha:
+    col1, col2= st.columns([5,1])
+
+    with col1:
+        item_a = st.selectbox("Escolha a ficha para anulação", options=opcoes_planilha, format_func=lambda x: x["label"])
+    
+    with col2:
+        valor_a = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_anulacao")
+
+    if st.button("Adicionar Anulação"):
+        if item_a:
+            novo = {**item_a, "valor": valor_a}
+            st.session_state.itens_anulacao.append(novo)
+            st.success("Anulação adicionada!")
+        else:
+            st.warning("Selecione uma ficha válida para anulação.")
+
+# ===============================
+# LISTAGEM
+# ===============================
+st.header("📋 5. Resumo")
+
+col1, col2= st.columns(2)
+
+with col1:
+    st.subheader("Créditos")
+    for idx, it in enumerate(st.session_state.itens_credito):
+        c1, c2, c3 = st.columns([5, 2, 1])
+        c1.markdown(f"**{it['label']}**")
+        c2.markdown(f"R$ {it['valor']:,.2f}")
+        if c3.button("❌", key=f"del_credito_{it['id']}"):
+            st.session_state.itens_credito.pop(idx)
+            st.rerun()
+
+with col2:
+    st.subheader("Anulações")
+    for idx, it in enumerate(st.session_state.itens_anulacao):
+        c1, c2, c3 = st.columns([5, 2, 1])
+        c1.markdown(f"**{it['label']}**")
+        c2.markdown(f"R$ {it['valor']:,.2f}")
+        if c3.button("❌", key=f"del_anulacao_{it['id']}"):
+            st.session_state.itens_anulacao.pop(idx)
+            st.rerun()
+        
+total_credito = sum(i["valor"] for i in st.session_state.itens_credito)
+total_fontes = sum(i["valor"] for i in st.session_state.itens_anulacao) + val_sup + val_exc        
+
+col1    , col2= st.columns(2)
+
+with col1:
+    st.metric("Total de Créditos", f"R$ {total_credito:,.2f}")
+
+with col2:
+    st.metric("Total de Fontes", f"R$ {total_fontes:,.2f}")
+
+# ===============================
+# JUSTIFICATIVA
+# ===============================
+st.header("✍️ 6. Justificativa")
+justificativa = st.text_area("Digite a justificativa")
+
+# ===============================
+# GERAR DOCUMENTO
+# ===============================
+st.header("📥 7. Gerar Documento")
+
+if st.button("Gerar DOCX"):
+    if round(total_credito, 2) != round(total_fontes, 2):
+        st.error("Os valores de crédito e fontes não batem. O financeiro surtou.")
+    else:
+        dados = {
+            "tipo_lei": tipo_lei,
+            "numero": numero,
+            "municipio": municipio,
+            "prefeito": prefeito,
+            "ppa": ppa,
+            "ldo": ldo,
+            "val_sup": val_sup,
+            "val_exc": val_exc,
+            "itens_credito": st.session_state.itens_credito,
+            "itens_anulacao": st.session_state.itens_anulacao,
+            "total_credito": total_credito,
+            "justificativa": justificativa
+        }
+
+        if tipo_doc == "Projeto de Lei":
+            buffer = gerar_projeto_lei(dados)
+        elif tipo_doc == "Lei Finalizada":
+            buffer = gerar_lei_final(dados)
+        else:
+            buffer = gerar_decreto(dados)
+
+        st.download_button(
+            label="⬇️ Baixar Documento",
+            data=buffer,
+            file_name=f"{tipo_doc}_{numero}.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
