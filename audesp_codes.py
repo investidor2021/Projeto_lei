@@ -291,114 +291,134 @@ MODALIDADES_APLICACAO = {
 }
 
 # ===============================
-# ELEMENTOS DE DESPESA (Sintéticos - Principais)
+# ELEMENTOS DE DESPESA (Mais Utilizados pelo Município)
 # ===============================
 ELEMENTOS_DESPESA = {
-    "01": "Aposentadorias, Reserva Remunerada e Reformas",
-    "03": "Pensões",
     "04": "Contratação por Tempo Determinado",
-    "05": "Outros Benefícios Previdenciários",
-    "06": "Benefício Mensal ao Deficiente e ao Idoso",
-    "07": "Contribuição a Entidades Fechadas de Previdência",
-    "08": "Outros Benefícios Assistenciais",
-    "09": "Salário Família",
-    "10": "Outros Benefícios de Natureza Social",
+    "08": "Outros Benefícios Assistenciais do Servidor e do Militar",
     "11": "Vencimentos e Vantagens Fixas - Pessoal Civil",
-    "12": "Vencimentos e Vantagens Fixas - Pessoal Militar",
     "13": "Obrigações Patronais",
     "14": "Diárias - Civil",
-    "15": "Diárias - Militar",
     "16": "Outras Despesas Variáveis - Pessoal Civil",
-    "17": "Outras Despesas Variáveis - Pessoal Militar",
-    "18": "Auxílio Financeiro a Estudantes",
-    "19": "Auxílio-Fardamento",
-    "20": "Auxílio Financeiro a Pesquisadores",
+    "18": "Auxílio Financeiro a Estudante",
     "21": "Juros sobre a Dívida por Contrato",
-    "22": "Outros Encargos sobre a Dívida por Contrato",
-    "23": "Juros, Deságios e Descontos da Dívida Mobiliária",
-    "24": "Outros Encargos sobre a Dívida Mobiliária",
-    "25": "Encargos sobre Operações de Crédito por Antecipação da Receita",
-    "26": "Obrigações decorrentes de Política Monetária",
-    "27": "Encargos pela Honra de Avais, Garantias, Seguros e Similares",
-    "28": "Remuneração de Cotas de Fundos Autárquicos",
     "30": "Material de Consumo",
-    "31": "Premiações Culturais, Artísticas, Científicas, Desportivas e Outras",
     "32": "Material, Bem ou Serviço para Distribuição Gratuita",
-    "33": "Passagens e Despesas com Locomoção",
-    "34": "Outras Despesas de Pessoal decorrentes de Contratos de Terceirização",
     "35": "Serviços de Consultoria",
     "36": "Outros Serviços de Terceiros - Pessoa Física",
-    "37": "Locação de Mão-de-Obra",
-    "38": "Arrendamento Mercantil",
     "39": "Outros Serviços de Terceiros - Pessoa Jurídica",
-    "41": "Contribuições",
-    "42": "Auxílios",
-    "43": "Subvenções Sociais",
-    "45": "Subvenções Econômicas",
+    "40": "Serviços de Tecnologia da Informação e Comunicação - Pessoa Jurídica",
     "46": "Auxílio-Alimentação",
     "47": "Obrigações Tributárias e Contributivas",
-    "48": "Outros Auxílios Financeiros a Pessoas Físicas",
-    "49": "Auxílio-Transporte",
     "51": "Obras e Instalações",
     "52": "Equipamentos e Material Permanente",
-    "53": "Aposentadorias do RGPS - Área Rural",
-    "54": "Aposentadorias do RGPS - Área Urbana",
-    "55": "Pensões do RGPS - Área Rural",
-    "56": "Pensões do RGPS - Área Urbana",
-    "57": "Outros Benefícios do RGPS - Área Rural",
-    "58": "Outros Benefícios do RGPS - Área Urbana",
-    "59": "Pensões Especiais",
     "61": "Aquisição de Imóveis",
-    "62": "Aquisição de Produtos para Revenda",
-    "63": "Aquisição de Títulos de Crédito",
-    "64": "Aquisição de Títulos Representativos de Capital já Integralizado",
-    "65": "Constituição ou Aumento de Capital de Empresas",
-    "66": "Concessão de Empréstimos e Financiamentos",
-    "67": "Depósitos Compulsórios",
+    "70": "Rateio pela Participação em Consórcio Público",
     "71": "Principal da Dívida Contratual Resgatado",
-    "72": "Principal da Dívida Mobiliária Resgatado",
-    "73": "Correção Monetária ou Cambial da Dívida Contratual Resgatada",
-    "74": "Correção Monetária ou Cambial da Dívida Mobiliária Resgatada",
-    "75": "Correção Monetária da Dívida de Operações de Crédito por Antecipação da Receita",
-    "76": "Principal Corrigido da Dívida Mobiliária Refinanciado",
-    "77": "Principal Corrigido da Dívida Contratual Refinanciado",
-    "81": "Distribuição de Receitas",
     "91": "Sentenças Judiciais",
     "92": "Despesas de Exercícios Anteriores",
     "93": "Indenizações e Restituições",
-    "94": "Indenizações e Restituições Trabalhistas",
-    "95": "Indenização pela Execução de Trabalhos de Campo",
-    "96": "Ressarcimento de Despesas de Pessoal Requisitado",
-    "97": "Aporte para Cobertura do Déficit Atuarial do RPPS",
-    "99": "A Classificar"
+    "99": "Reserva de Contingência"
 }
 
 # ===============================
-# FONTES DE RECURSOS (Principais - AUDESP)
+# FONTES DE RECURSOS (Utilizadas pelo Município)
 # ===============================
 FONTES_RECURSOS = {
-    "00": "Recursos Ordinários",
-    "01": "Recursos Vinculados",
-    "02": "Educação",
-    "03": "Saúde",
-    "04": "FUNDEB",
-    "05": "Assistência Social",
-    "06": "Convênios",
+    "01": "Tesouro",
+    "02": "Transferências e Convênios Estaduais - Vinculados",
+    "03": "Recursos Próprios de Fundos Especiais de Despesa - Vinculados",
+    "04": "Recursos Próprios da Administração Indireta",
+    "05": "Transferências e Convênios Federais - Vinculados",
+    "06": "Outras Fontes de Recursos",
     "07": "Operações de Crédito",
-    "08": "Royalties",
-    "09": "Compensações Financeiras",
-    "10": "Alienação de Bens",
-    "11": "Transferências do FUNDEB",
-    "12": "Transferências de Convênios",
-    "13": "Transferências Voluntárias",
-    "14": "Transferências Obrigatórias",
-    "15": "Outras Transferências",
-    "16": "Recursos Próprios",
-    "17": "Recursos de Terceiros",
-    "18": "Recursos Vinculados à Saúde",
-    "19": "Recursos Vinculados à Educação",
-    "20": "Recursos do SUS",
-    # Adicione mais conforme necessário
+    "08": "Emendas Parlamentares Individuais - Legislativo Municipal",
+    "19": "Recursos Extraorçamentários",
+    "91": "Tesouro - Exercícios Anteriores",
+    "92": "Transferências e Convênios Estaduais - Vinculados - Exercícios Anteriores",
+    "93": "Recursos Próprios de Fundos Especiais de Despesa - Vinculados - Exercícios Anteriores",
+    "94": "Recursos Próprios da Administração Indireta - Exercícios Anteriores",
+    "95": "Transferências e Convênios Federais - Vinculados - Exercícios Anteriores",
+    "96": "Outras Fontes de Recursos - Exercícios Anteriores",
+    "97": "Operações de Crédito - Exercícios Anteriores",
+    "98": "Emendas Parlamentares Individuais - Exercícios Anteriores"
+}
+
+# ===============================
+# APLICAÇÕES (Códigos de Aplicação do Município)
+# ===============================
+APLICACOES = {
+    # GERAL
+    "0000": "Geral",
+    
+    # EDUCAÇÃO (200-299)
+    "0200": "Educação",
+    "0210": "Educação Infantil",
+    "0212": "Educação Infantil - Creche",
+    "0213": "Educação Infantil - Pré-Escola",
+    "0220": "Ensino Fundamental",
+    "0230": "Ensino Médio",
+    "0240": "Educação Especial",
+    "0260": "Educação - FUNDEB",
+    "0261": "Educação - FUNDEB - Magistério/Profissionais da Educação",
+    "0262": "Educação - FUNDEB - Outros",
+    "0271": "Educação - FUNDEB - Magistério - Creche",
+    "0272": "Educação - FUNDEB - Magistério - Pré-Escola",
+    "0273": "Educação - FUNDEB - Outros - Creche",
+    "0274": "Educação - FUNDEB - Outros - Pré-Escola",
+    "0280": "Recursos do Salário Educação - Creche",
+    "0281": "Recursos do Salário Educação - Pré-Escola",
+    "0282": "Recursos do Salário Educação - Ensino Fundamental",
+    "0283": "PNAE - Creche",
+    "0284": "PNAE - Pré-Escola",
+    "0285": "PNAE - Ensino Fundamental",
+    "0286": "PNATE - Creche",
+    "0287": "PNATE - Pré-Escola",
+    "0288": "PNATE - Ensino Fundamental",
+    "0291": "PDDE - Creche",
+    "0292": "PDDE - Pré-Escola",
+    "0293": "PDDE - Ensino Fundamental",
+    
+    # SAÚDE (300-399)
+    "0300": "Saúde",
+    "0301": "Atenção Básica",
+    "0302": "Atenção de Média e Alta Complexidade",
+    "0303": "Vigilância em Saúde",
+    "0304": "Assistência Farmacêutica",
+    "0305": "Gestão do SUS",
+    "0307": "Outros Programas Financiados por Transferências Fundo a Fundo",
+    "0308": "Convênios SUS",
+    "0309": "Serviços de Saúde",
+    "0310": "Saúde - Geral",
+    "0312": "Recursos para Combate ao Coronavírus",
+    "0313": "Transferências para ACS e ACE",
+    "0350": "Bloco de Custeio das Ações e Serviços Públicos de Saúde",
+    "0360": "Bloco de Investimentos na Rede de Serviços de Saúde",
+    "0370": "Assistência Financeira Complementar - Piso Salarial da Enfermagem",
+    
+    # TRÂNSITO (400-499)
+    "0400": "Trânsito",
+    "0410": "Trânsito - Sinalização",
+    "0420": "Trânsito - Engenharia de Trânsito",
+    "0430": "Trânsito - Engenharia de Campo",
+    "0440": "Trânsito - Policiamento",
+    "0450": "Trânsito - Fiscalização",
+    "0460": "Trânsito - Educação de Trânsito",
+    "0470": "Trânsito - FUNSET",
+    
+    # ASSISTÊNCIA SOCIAL (500-599)
+    "0500": "Assistência Social",
+    "0510": "Assistência Social - Geral",
+    
+    # REGIME PRÓPRIO DE PREVIDÊNCIA (600-699)
+    "0600": "Regime Próprio de Previdência Social",
+    "0601": "RPPS - Plano Financeiro",
+    "0602": "RPPS - Plano Previdenciário",
+    "0603": "RPPS - Plano Previdenciário - Poder Executivo",
+    "0604": "RPPS - Plano Previdenciário - Poder Legislativo",
+    "0605": "RPPS - Plano Financeiro - Poder Executivo",
+    "0606": "RPPS - Plano Financeiro - Poder Legislativo",
+    "0690": "RPPS - Taxa Administração"
 }
 
 
@@ -537,6 +557,10 @@ def obter_opcoes_elemento():
 def obter_opcoes_fonte():
     """Retorna lista formatada para selectbox do Streamlit."""
     return [(cod, f"{cod} - {nome}") for cod, nome in sorted(FONTES_RECURSOS.items())]
+
+def obter_opcoes_aplicacao():
+    """Retorna lista formatada para selectbox do Streamlit."""
+    return [(cod, f"{cod} - {nome}") for cod, nome in sorted(APLICACOES.items())]
 
 def compor_dotacao_completa(depto, funcao, subfuncao, programa, grupo_nat, num_projeto,
                             cat_econ, grupo_desp, modalidade, elemento, desdobramento,
