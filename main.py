@@ -581,7 +581,7 @@ else:
 st.header("➖ 4. Anulação (sempre pela planilha)")
 
 if opcoes_planilha:
-    col1, col2= st.columns([5,1])
+    col1, col2, col3 = st.columns([5,1,1])
 
     with col1:
         item_a = st.selectbox("Escolha a ficha para anulação", options=opcoes_planilha, format_func=lambda x: x["label"])
@@ -589,13 +589,14 @@ if opcoes_planilha:
     with col2:
         valor_a = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_anulacao")
 
-    if st.button("Adicionar Anulação"):
-        if item_a:
-            novo = {**item_a, "valor": valor_a}
-            st.session_state.itens_anulacao.append(novo)
-            st.success("Anulação adicionada!")
-        else:
-            st.warning("Selecione uma ficha válida para anulação.")
+    with col3:
+        if st.button("Adicionar Anulação"):
+            if item_a:
+                novo = {**item_a, "valor": valor_a}
+                st.session_state.itens_anulacao.append(novo)
+                st.success("Anulação adicionada!")
+            else:
+                st.warning("Selecione uma ficha válida para anulação.")
 
 # ===============================
 # LISTAGEM
