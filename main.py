@@ -344,24 +344,32 @@ else:
                     key="num_projeto_manual_nome"
                 )
             
+            # Validação: verificar se o código já existe
+            if num_projeto_selecionado and num_projeto_selecionado in projetos_disponiveis:
+                st.info(f"ℹ️ Este código já existe na planilha: **{projetos_disponiveis[num_projeto_selecionado]}**")
+            
             # Botão para salvar na planilha
             if st.button("💾 Salvar na Planilha", key="salvar_projeto"):
                 if num_projeto_selecionado and nome_projeto_manual:
-                    try:
-                        # Salvar na planilha do Google Sheets
-                        sheets_client.add_projeto_atividade(
-                            DEFAULT_SHEET_ID,
-                            "projetos",
-                            num_projeto_selecionado,
-                            nome_projeto_manual
-                        )
-                        # Atualizar session state
-                        st.session_state["projetos_atividades"][num_projeto_selecionado] = nome_projeto_manual
-                        projetos_disponiveis[num_projeto_selecionado] = nome_projeto_manual
-                        st.success(f"✅ Projeto {num_projeto_selecionado} - {nome_projeto_manual} salvo!")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Erro ao salvar: {str(e)}")
+                    # Verificar novamente se já existe antes de salvar
+                    if num_projeto_selecionado in projetos_disponiveis:
+                        st.warning(f"⚠️ Código {num_projeto_selecionado} já existe: {projetos_disponiveis[num_projeto_selecionado]}")
+                    else:
+                        try:
+                            # Salvar na planilha do Google Sheets
+                            sheets_client.add_projeto_atividade(
+                                DEFAULT_SHEET_ID,
+                                "projetos",
+                                num_projeto_selecionado,
+                                nome_projeto_manual
+                            )
+                            # Atualizar session state
+                            st.session_state["projetos_atividades"][num_projeto_selecionado] = nome_projeto_manual
+                            projetos_disponiveis[num_projeto_selecionado] = nome_projeto_manual
+                            st.success(f"✅ Projeto {num_projeto_selecionado} - {nome_projeto_manual} salvo!")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Erro ao salvar: {str(e)}")
                 else:
                     st.warning("Preencha código e nome do projeto")
     
