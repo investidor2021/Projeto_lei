@@ -312,14 +312,58 @@ else:
         )
     
     with col3:
-        # Número do Projeto/Atividade
-        opcoes_num_projeto = [(cod, f"{cod} - {nome}") for cod, nome in sorted(projetos_disponiveis.items())]
-        num_projeto_selecionado = st.selectbox(
-            "Número Proj/Ativ",
-            options=[cod for cod, _ in opcoes_num_projeto],
-            format_func=lambda x: next(label for cod, label in opcoes_num_projeto if cod == x),
-            key="num_projeto_completo"
+        # Número do Projeto/Atividade com opção manual
+        modo_projeto = st.radio(
+            "Projeto/Atividade",
+            options=["Selecionar da lista", "Digitar manualmente"],
+            key="modo_projeto",
+            horizontal=True
         )
+        
+        if modo_projeto == "Selecionar da lista":
+            opcoes_num_projeto = [(cod, f"{cod} - {nome}") for cod, nome in sorted(projetos_disponiveis.items())]
+            num_projeto_selecionado = st.selectbox(
+                "Número Proj/Ativ",
+                options=[cod for cod, _ in opcoes_num_projeto],
+                format_func=lambda x: next(label for cod, label in opcoes_num_projeto if cod == x),
+                key="num_projeto_completo"
+            )
+        else:
+            # Entrada manual
+            col_cod, col_nome = st.columns([1, 2])
+            with col_cod:
+                num_projeto_selecionado = st.text_input(
+                    "Código",
+                    placeholder="Ex: 2.126",
+                    key="num_projeto_manual_cod"
+                )
+            with col_nome:
+                nome_projeto_manual = st.text_input(
+                    "Nome do Projeto/Atividade",
+                    placeholder="Ex: Manutenção da Saúde",
+                    key="num_projeto_manual_nome"
+                )
+            
+            # Botão para salvar na planilha
+            if st.button("💾 Salvar na Planilha", key="salvar_projeto"):
+                if num_projeto_selecionado and nome_projeto_manual:
+                    try:
+                        # Salvar na planilha do Google Sheets
+                        sheets_client.add_projeto_atividade(
+                            DEFAULT_SHEET_ID,
+                            "projetos",
+                            num_projeto_selecionado,
+                            nome_projeto_manual
+                        )
+                        # Atualizar session state
+                        st.session_state["projetos_atividades"][num_projeto_selecionado] = nome_projeto_manual
+                        projetos_disponiveis[num_projeto_selecionado] = nome_projeto_manual
+                        st.success(f"✅ Projeto {num_projeto_selecionado} - {nome_projeto_manual} salvo!")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Erro ao salvar: {str(e)}")
+                else:
+                    st.warning("Preencha código e nome do projeto")
     
     # ===== MODO DE ELEMENTO DE DESPESA =====
     st.markdown("---")

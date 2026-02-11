@@ -144,3 +144,30 @@ def get_aplicacoes(sheet_key, worksheet_name="aplicacoes"):
     except Exception as e:
         # Retorna dicionário vazio se a aba não existir ou houver erro
         return {}
+
+
+def add_projeto_atividade(sheet_key, worksheet_name, codigo, nome):
+    """
+    Adiciona um novo projeto/atividade na planilha do Google Sheets.
+    
+    Args:
+        sheet_key: ID da planilha
+        worksheet_name: Nome da aba (ex: "projetos")
+        codigo: Código do projeto (ex: "2.126")
+        nome: Nome do projeto (ex: "Manutenção da Saúde")
+    """
+    try:
+        client = get_connection()
+        if not client:
+            raise Exception("Não foi possível conectar ao Google Sheets")
+        
+        sheet = client.open_by_key(sheet_key)
+        worksheet = sheet.worksheet(worksheet_name)
+        
+        # Adiciona nova linha com código e nome
+        worksheet.append_row([codigo, nome])
+        
+        return True
+    
+    except Exception as e:
+        raise Exception(f"Erro ao salvar projeto: {str(e)}")

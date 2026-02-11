@@ -262,14 +262,15 @@ def gerar_projeto_lei(dados):
         for row in table_a.rows:
             for idx, width in enumerate(widths):
                 row.cells[idx].width = width
-
-    p = doc.add_paragraph(f"Total {format_currency(dados['total_anul'])}")
-    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    p.runs[0].bold = True
-    p.runs[0].font.name = 'Times New Roman'
-    p.runs[0].font.size = Pt(12)        
+        
+        # Total da anulação
+        p = doc.add_paragraph(f"Total {format_currency(total_anul)}")
+        p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        p.runs[0].bold = True
+        p.runs[0].font.name = 'Times New Roman'
+        p.runs[0].font.size = Pt(12)        
                 
-        doc.add_paragraph()
+        #doc.add_paragraph()
         art_num += 1
 
     # ---------------------------------------------------------
