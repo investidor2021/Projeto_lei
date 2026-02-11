@@ -97,8 +97,8 @@ with st.expander("📄 1. Identificação", expanded=True):
     municipio = c2.text_input("Município", "Vargem Grande do Sul")
     prefeito = c3.text_input("Prefeito", "CELSO LUIS RIBEIRO")
 
-    ppa = c1.text_input("PPA", "Lei nº 4.598/2021")
-    ldo = c2.text_input("LDO", "Lei nº 4.998/2024")
+    ppa = c1.text_input("PPA", "Lei n.º 5.144, de 21 de outubro de 2025")
+    ldo = c2.text_input("LDO", "Lei n.º 5.112 de 18 de junho de 2025")
 
 # ===============================
 # FONTES DE RECURSO

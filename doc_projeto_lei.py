@@ -83,7 +83,7 @@ def gerar_projeto_lei(dados):
     # Ementa
     p = doc.add_paragraph(f"Dispõe sobre a abertura de Crédito Adicional {dados['tipo_lei']}")
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    p.runs[0].bold = True
+    p.runs[0].bold = False
     p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
     
@@ -99,12 +99,12 @@ def gerar_projeto_lei(dados):
     p.paragraph_format.first_line_indent = Cm(1.27)
     
     #doc.add_paragraph()
-    p.paragraph_format.first_line_indent = Cm(1.27)
+    
     p = doc.add_paragraph("Faço saber que a Câmara Municipal decreta e eu sanciono a seguinte Lei:")
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
-    
+    p.paragraph_format.first_line_indent = Cm(1.27)
     #doc.add_paragraph()
 
     # ---------------------------------------------------------
@@ -262,8 +262,14 @@ def gerar_projeto_lei(dados):
         for row in table_a.rows:
             for idx, width in enumerate(widths):
                 row.cells[idx].width = width
+
+        p = doc.add_paragraph(f"Total {format_currency(dados['total_anul'])}")
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p.runs[0].bold = True
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)        
                 
-        #doc.add_paragraph()
+        doc.add_paragraph()
         art_num += 1
 
     # ---------------------------------------------------------
@@ -302,7 +308,7 @@ def gerar_projeto_lei(dados):
     data_extenso = f"Prefeitura Municipal de {dados['municipio']}, {hoje.day} de {meses[hoje.month]} de {hoje.year}."
     
     p = doc.add_paragraph(data_extenso)
-    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
