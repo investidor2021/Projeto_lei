@@ -462,11 +462,11 @@ APLICACOES = {
     "0604": "RPPS - Plano Previdenciário - Poder Legislativo",
     "0605": "RPPS - Plano Financeiro - Poder Executivo",
     "0606": "RPPS - Plano Financeiro - Poder Legislativo",
-    "0690": "RPPS - Taxa Administração"
+    "0690": "RPPS - Taxa Administração",
 
-    # Emendas
-    "0800": "Emendas Parlamentares"
-    "0801": "Emendas Parlamentares Estaduais"
+    # EMENDAS (800-899)
+    "0800": "Emendas Parlamentares",
+    "0801": "Emendas Parlamentares Estaduais",
     "0802": "Emendas Parlamentares Municipais"
 }
 
