@@ -591,6 +591,10 @@ def obter_opcoes_elemento_detalhado():
     """Retorna lista formatada de elementos DETALHADOS (apenas elemento) para selectbox."""
     return [(cod, f"{cod} - {nome}") for cod, nome in sorted(ELEMENTOS_DESPESA_DETALHADOS.items())]
 
+def obter_opcoes_elemento():
+    """Compatibilidade: redireciona para elementos simplificados."""
+    return obter_opcoes_elemento_simplificado()
+
 def obter_opcoes_fonte():
     """Retorna lista formatada para selectbox do Streamlit."""
     return [(cod, f"{cod} - {nome}") for cod, nome in sorted(FONTES_RECURSOS.items())]
