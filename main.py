@@ -592,6 +592,7 @@ if opcoes_planilha:
         valor_a = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_anulacao")
 
     with col3:
+        st.markdown("<br>", unsafe_allow_html=True)
         if st.button("Adicionar Anulação"):
             if item_a:
                 novo = {**item_a, "valor": valor_a}
