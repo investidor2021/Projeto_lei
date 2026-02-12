@@ -4,11 +4,7 @@ from docx.shared import Pt, Cm, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from doc_base import (
-    configurar_estilo, adicionar_titulo, adicionar_ementa,
-    adicionar_data_assinatura, salvar_docx,
-    format_currency, extenso_brl
-)
+from doc_base import format_currency, extenso_brl, configurar_estilo, salvar_docx
 import os
 
 
