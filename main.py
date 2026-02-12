@@ -115,16 +115,27 @@ with f1:
 
 with f2:
     usa_exc = st.checkbox("Excesso de Arrecadação")
-    val_exc = st.number_input("Valor Excesso", min_value=0.0, disabled=not usa_exc, format="%.2f")
 
-# Campo de origem para excesso de arrecadação
+# Se excesso de arrecadação estiver marcado, mostrar 3 colunas (1:1:2)
 origem_recursos = ""
-if usa_exc and val_exc > 0:
-    origem_recursos = st.text_input(
-        "Origem dos Recursos",
-        placeholder="Ex: Proposta nº 63000724740202600, destinada ao custeio...",
-        help="Informe a origem específica (proposta, convênio, etc.)"
-    )
+if usa_exc:
+    exc_col1, exc_col2, exc_col3 = st.columns([1, 1, 2])
+    
+    with exc_col1:
+        st.markdown("**Valor Excesso**")
+    
+    with exc_col2:
+        val_exc = st.number_input("Valor Excesso", min_value=0.0, format="%.2f", label_visibility="collapsed", key="val_exc_input")
+    
+    with exc_col3:
+        origem_recursos = st.text_input(
+            "Origem dos Recursos",
+            placeholder="Ex: Proposta nº 63000724740202600, destinada ao custeio...",
+            help="Informe a origem específica (proposta, convênio, etc.)"
+        )
+else:
+    val_exc = 0.0
+
 
 # ===============================
 # PLANILHA
