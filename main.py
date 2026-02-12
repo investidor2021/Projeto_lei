@@ -93,9 +93,12 @@ with st.expander("📄 1. Identificação", expanded=True):
     tipo_doc = c1.radio("Tipo do Documento", ["Projeto de Lei", "Lei Finalizada", "Decreto"], horizontal=True)
     tipo_lei = c2.radio("Tipo de Crédito", ["Suplementar", "Especial"], horizontal=True)
 
-    numero = c1.text_input("Número", placeholder="Ex: 10/2026")
+    numero = c1.text_input("Número da Lei", placeholder="Ex: 5.182/2026")
+    numero_projeto = c2.text_input("Número do Projeto", placeholder="Ex: 26/2026")
     municipio = c2.text_input("Município", "Vargem Grande do Sul")
     prefeito = c3.text_input("Prefeito", "CELSO LUIS RIBEIRO")
+    
+    secretaria = c3.text_input("Secretária", "RITA DE CÁSSIA CÔRTES FERRAZ")
 
     ppa = c1.text_input("PPA", "Lei n.º 5.144, de 21 de outubro de 2025")
     ldo = c2.text_input("LDO", "Lei n.º 5.112 de 18 de junho de 2025")
@@ -659,8 +662,10 @@ if st.button("Gerar DOCX"):
         dados = {
             "tipo_lei": tipo_lei,
             "numero": numero,
+            "numero_projeto": numero_projeto,
             "municipio": municipio,
             "prefeito": prefeito,
+            "secretaria": secretaria,
             "ppa": ppa,
             "ldo": ldo,
             "val_sup": val_sup,
