@@ -1,234 +1,301 @@
 from docx import Document
-from docx.shared import Pt, Cm
+from datetime import date
+from docx.shared import Pt, Cm, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from datetime import datetime
-import io
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+from doc_base import (
+    configurar_estilo, adicionar_titulo, adicionar_ementa,
+    adicionar_data_assinatura, salvar_docx,
+    format_currency, extenso_brl
+)
+import os
 
-def format_currency(valor):
-    """Formata valor monetário"""
-    return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
-def extenso_brl(valor):
-    """Retorna valor por extenso (simplificado)"""
-    # Implementação simplificada - você pode melhorar depois
-    return f"{int(valor)} reais"
+def add_coat_of_arms(doc):
+    """Adiciona o brasão e cabeçalho oficial no documento."""
+    # Caminho para o brasão
+    brasao_path = os.path.join(os.path.dirname(__file__), "assets", "brasao.jpg")
+    
+    # Adicionar brasão centralizado
+    p_brasao = doc.add_paragraph()
+    p_brasao.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = p_brasao.add_run()
+    run.add_picture(brasao_path, width=Cm(4.5))  # Ajustar tamanho conforme necessário
+
 
 def gerar_decreto(dados):
-    """
-    Gera um Decreto em formato DOCX seguindo o modelo oficial.
-    """
-    
     doc = Document()
+    configurar_estilo(doc)
     
-    # Configurar margens
-    sections = doc.sections
-    for section in sections:
-        section.top_margin = Cm(2.5)
-        section.bottom_margin = Cm(2.5)
-        section.left_margin = Cm(3.0)
-        section.right_margin = Cm(2.0)
+    # ---------------------------------------------------------
+    # CABEÇALHO COM BRASÃO
+    # ---------------------------------------------------------
+    add_coat_of_arms(doc)
     
-    # =============================
-    # TÍTULO
-    # =============================
-    p_titulo = doc.add_paragraph()
-    p_titulo.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p_titulo.add_run(f"DECRETO N.º {dados['numero']}")
-    run.bold = True
-    run.font.size = Pt(12)
+    # ---------------------------------------------------------
+    # TÍTULO - DECRETO N.º
+    # ---------------------------------------------------------
+    meses = {1:'janeiro', 2:'fevereiro', 3:'março', 4:'abril', 5:'maio', 6:'junho',
+             7:'julho', 8:'agosto', 9:'setembro', 10:'outubro', 11:'novembro', 12:'dezembro'}
+    hoje = date.today()
     
-    # =============================
-    # EMENTA
-    # =============================
-    p_ementa = doc.add_paragraph()
-    p_ementa.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p_ementa.add_run(f"Dispõe sobre a autorização para abertura de Crédito Adicional {dados['tipo_lei']}")
-    run.font.size = Pt(12)
+    p = doc.add_paragraph(f"DECRETO N.º {dados['numero']}, DE {hoje.day} DE {meses[hoje.month].upper()} DE {hoje.year}")
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.runs[0].bold = True
+    p.runs[0].font.size = Pt(14)
+    p.runs[0].font.name = 'Times New Roman'
     
-    # Espaço
-    doc.add_paragraph()
+    doc.add_paragraph()  # Espaço
     
-    # =============================
-    # INTRODUÇÃO
-    # =============================
-    p_intro = doc.add_paragraph()
-    p_intro.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p_intro.add_run(f"        O Prefeito Municipal de {dados['municipio']}, Estado de São Paulo, usando de suas atribuições legais,")
+    # Ementa
+    p = doc.add_paragraph(f"Dispõe sobre a autorização para abertura de Crédito Adicional {dados['tipo_lei']}")
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p.runs[0].bold = False
+    p.runs[0].font.size = Pt(12)
+    p.runs[0].font.name = 'Times New Roman'
     
-    # Espaço
-    doc.add_paragraph()
+    # ---------------------------------------------------------
+    # PREÂMBULO
+    # ---------------------------------------------------------
+    p = doc.add_paragraph(f"        O Prefeito Municipal de {dados['municipio']}, Estado de São Paulo, usando de suas atribuições legais,")
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)
     
-    # DECRETA
-    p_decreta = doc.add_paragraph()
-    p_decreta.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    run = p_decreta.add_run("         DECRETA:")
-    run.bold = True
+    doc.add_paragraph()  # Espaço
     
-    # Espaço
-    doc.add_paragraph()
+    p = doc.add_paragraph("         DECRETA:")
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.runs[0].bold = True
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)
     
-    # =============================
+    doc.add_paragraph()  # Espaço
+
+    # ---------------------------------------------------------
     # ARTIGO 1º - CRÉDITOS
-    # =============================
-    p_art1 = doc.add_paragraph()
-    p_art1.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p_art1.add_run(
+    # ---------------------------------------------------------
+    texto_art1 = (
         f"         Art.1º Fica o Executivo Municipal autorizado a abrir no Departamento de Finanças/ "
         f"Divisão de Controle Financeiro da Prefeitura, um Crédito Adicional {dados['tipo_lei']} "
         f"na importância de {format_currency(dados['total_credito'])} ({extenso_brl(dados['total_credito'])}), "
         f"para atender as seguintes dotações:"
     )
     
-    # Espaço
-    doc.add_paragraph()
+    p = doc.add_paragraph(texto_art1)
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)
+
+    # ---------------------------------------------------------
+    # TABELA DE DOTAÇÕES
+    # ---------------------------------------------------------
+    # Criar tabela com 2 colunas
+    table = doc.add_table(rows=0, cols=2)
+    table.style = "Table Grid"
     
-    # Tabela de créditos
+    # Definindo larguras
+    widths = [Cm(13.5), Cm(2.5)]
+    
+    # Preencher itens
     for item in dados['itens_credito']:
-        p_item = doc.add_paragraph()
-        p_item.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        row = table.add_row()
+        cells = row.cells
         
-        # Ficha/código e descrição
-        ficha = item.get('ficha', '')
-        label = item.get('label', '')
-        valor = item.get('valor', 0)
+        # Coluna 1: Código - Nome Elemento - Nome Departamento
+        texto_completo = item.get('label_docx', item.get('label', ''))
         
-        # Formatar linha
-        p_item.add_run(f"{ficha}\t{label}\t{format_currency(valor)}")
-        p_item.paragraph_format.tab_stops.add_tab_stop(Cm(1))
-        p_item.paragraph_format.tab_stops.add_tab_stop(Cm(15))
+        c0 = cells[0].paragraphs[0]
+        c0.text = texto_completo
+        c0.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        
+        # Coluna 2: Valor
+        c1 = cells[1].paragraphs[0]
+        c1.text = format_currency(item.get('valor', 0))
+        c1.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        
+        # Ajuste de fonte para caber (8pt)
+        for c in cells:
+            for p in c.paragraphs:
+                for r in p.runs:
+                    r.font.size = Pt(8)
+                    r.font.name = 'Times New Roman'
+    
+    # Aplicar larguras
+    for row in table.rows:
+        for idx, width in enumerate(widths):
+            row.cells[idx].width = width
     
     # Total
-    p_total = doc.add_paragraph()
-    p_total.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    run = p_total.add_run(f"TOTAL\t{format_currency(dados['total_credito'])}")
-    run.bold = True
+    p = doc.add_paragraph(f"TOTAL {format_currency(dados['total_credito'])}")
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p.runs[0].bold = True
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)
     
-    # Espaço
-    doc.add_paragraph()
-    doc.add_paragraph()
+    doc.add_paragraph()  # Espaço
+    doc.add_paragraph()  # Espaço
+
+    # ---------------------------------------------------------
+    # ARTIGO 2º - FONTES
+    # ---------------------------------------------------------
+    art_num = 2
     
-    # =============================
-    # ARTIGO 2º - ANULAÇÕES
-    # =============================
-    p_art2 = doc.add_paragraph()
-    p_art2.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p_art2.add_run(
-        "         Art.2º Para cobertura do crédito autorizado no artigo anterior serão anuladas as seguintes dotações:"
-    )
-    
-    # Espaço
-    doc.add_paragraph()
-    
-    # Tabela de anulações
-    for item in dados['itens_anulacao']:
-        p_item = doc.add_paragraph()
-        p_item.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    # Se houver ANULAÇÃO
+    if dados['itens_anulacao']:
+        texto_art2 = (
+            f"         Art.{art_num}º Para cobertura do crédito autorizado no artigo anterior serão anuladas as seguintes dotações:"
+        )
+        p = doc.add_paragraph(texto_art2)
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p.runs[0].font.name = 'Times New Roman'
+        p.runs[0].font.size = Pt(12)
         
-        ficha = item.get('ficha', '')
-        label = item.get('label', '')
-        valor = item.get('valor', 0)
+        # Tabela de anulação
+        table_a = doc.add_table(rows=0, cols=2)
+        table_a.style = 'Table Grid'
         
-        p_item.add_run(f"{ficha}\t{label}\t{format_currency(valor)}")
-        p_item.paragraph_format.tab_stops.add_tab_stop(Cm(1))
-        p_item.paragraph_format.tab_stops.add_tab_stop(Cm(15))
+        for item in dados['itens_anulacao']:
+            row = table_a.add_row()
+            cells = row.cells
+            
+            texto_completo = item.get('label_docx', item.get('label', ''))
+            cells[0].paragraphs[0].text = texto_completo
+            cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+            
+            cells[1].paragraphs[0].text = format_currency(item.get('valor', 0))
+            cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            
+            for c in cells:
+                for p in c.paragraphs:
+                    for r in p.runs:
+                        r.font.size = Pt(8)
+                        r.font.name = 'Times New Roman'
+        
+        # Aplicar larguras
+        for row in table_a.rows:
+            for idx, width in enumerate(widths):
+                row.cells[idx].width = width
+        
+        # Total da anulação
+        total_anulacao = sum(i['valor'] for i in dados['itens_anulacao'])
+        p = doc.add_paragraph(f"TOTAL {format_currency(total_anulacao)}")
+        p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        p.runs[0].bold = True
+        p.runs[0].font.name = 'Times New Roman'
+        p.runs[0].font.size = Pt(12)
+        
+        doc.add_paragraph()  # Espaço
+        art_num += 1
     
-    # Total
-    total_anulacao = sum(i['valor'] for i in dados['itens_anulacao'])
-    p_total_anul = doc.add_paragraph()
-    p_total_anul.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    run = p_total_anul.add_run(f"TOTAL\t{format_currency(total_anulacao)}")
-    run.bold = True
+    # Se houver superávit
+    elif dados['val_sup'] > 0:
+        texto_sup = (
+            f"         Art.{art_num}º As despesas decorrentes deste decreto serão suportadas com recursos provenientes do "
+            f"superávit financeiro, apurado na Prefeitura Municipal, nos termos do inc. I, § 1º, do art. 43, "
+            f"da Lei n.º 4.320, de 17 de março de 1964, constituído pela diferença positiva entre o ativo e o passivo financeiro, "
+            f"apurado no Balanço Patrimonial do exercício anterior, na importância de {format_currency(dados['val_sup'])} "
+            f"({extenso_brl(dados['val_sup'])})."
+        )
+        p = doc.add_paragraph(texto_sup)
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p.runs[0].font.name = 'Times New Roman'
+        p.runs[0].font.size = Pt(12)
+        doc.add_paragraph()  # Espaço
+        art_num += 1
     
-    # Espaço
-    doc.add_paragraph()
-    
-    # =============================
+    # Se houver excesso de arrecadação
+    elif dados['val_exc'] > 0:
+        texto_exc = (
+            f"         Art.{art_num}º As despesas decorrentes deste decreto serão suportadas com recursos provenientes de "
+            f"excesso de arrecadação, nos termos do inciso II, § 1º, do artigo 43, da Lei nº 4.320, de 17 de março de 1964"
+        )
+        
+        if dados.get('origem_recursos'):
+            texto_exc += f", oriundos de {dados['origem_recursos']}"
+        
+        texto_exc += f", no valor de {format_currency(dados['val_exc'])} ({extenso_brl(dados['val_exc'])})."
+        
+        p = doc.add_paragraph(texto_exc)
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p.runs[0].font.name = 'Times New Roman'
+        p.runs[0].font.size = Pt(12)
+        doc.add_paragraph()  # Espaço
+        art_num += 1
+
+    # ---------------------------------------------------------
     # ARTIGO 3º - PPA/LDO
-    # =============================
-    p_art3 = doc.add_paragraph()
-    p_art3.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    
+    # ---------------------------------------------------------
     # Extrair números das leis
-    ldo_num = dados.get('ldo', '').split('nº')[1].strip() if 'nº' in dados.get('ldo', '') else dados.get('ldo', '')
-    ppa_num = dados.get('ppa', '').split('nº')[1].strip() if 'nº' in dados.get('ppa', '') else dados.get('ppa', '')
+    ldo_info = dados.get('ldo', '')
+    ppa_info = dados.get('ppa', '')
     
-    p_art3.add_run(
-        f"         Art.3º As alterações promovidas nos artigos 1º e 2º do presente decreto, passam a fazer parte "
-        f"da LDO nº {ldo_num} e PPA nº {ppa_num} visando atender ao disposto nos artigos 165 e 168 da CF, "
+    texto_art3 = (
+        f"         Art.{art_num}º As alterações promovidas nos artigos 1º e 2º do presente decreto, passam a fazer parte "
+        f"da LDO {ldo_info} e PPA {ppa_info} visando atender ao disposto nos artigos 165 e 168 da CF, "
         f"artigo 2º da Instrução nº 2, do Tribunal de Contas do Estado de São Paulo, da LC 101, de 04 de maio de 2.000 e, "
         f"finalmente, para atender ao Projeto Audesp do Tribunal de Contas do Estado de São Paulo."
     )
+    p = doc.add_paragraph(texto_art3)
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)
     
-    # Espaço
-    p_art4_space = doc.add_paragraph()
-    p_art4_space.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    
-    # =============================
+    art_num += 1
+
+    # ---------------------------------------------------------
     # ARTIGO 4º - VIGÊNCIA
-    # =============================
-    p_art4 = doc.add_paragraph()
-    p_art4.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p_art4.add_run("       Art.4º Este decreto entra em vigor na data de sua publicação.")
+    # ---------------------------------------------------------
+    p = doc.add_paragraph(f"       Art.{art_num}º Este decreto entra em vigor na data de sua publicação.")
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)
     
-    # Espaço
-    p_local = doc.add_paragraph()
-    p_local.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    
-    # =============================
+    # ---------------------------------------------------------
     # DATA E LOCAL
-    # =============================
-    hoje = datetime.now()
-    meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 
-             'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
-    data_extenso = f"{hoje.day} de {meses[hoje.month-1]} de {hoje.year}"
+    # ---------------------------------------------------------
+    data_extenso = f"        {dados['municipio']}, {hoje.day} de {meses[hoje.month]} de {hoje.year}."
     
-    p_data = doc.add_paragraph()
-    p_data.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p_data.add_run(f"        {dados['municipio']}, {data_extenso}.")
+    p = doc.add_paragraph(data_extenso)
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)
     
-    # Espaço
-    doc.add_paragraph()
-    doc.add_paragraph()
+    # 3 linhas em branco
+    doc.add_paragraph("\n\n")
     
-    # =============================
+    # ---------------------------------------------------------
     # ASSINATURA PREFEITO
-    # =============================
-    p_prefeito = doc.add_paragraph()
-    p_prefeito.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p_prefeito.add_run(dados['prefeito'])
-    run.bold = True
+    # ---------------------------------------------------------
+    p = doc.add_paragraph(dados['prefeito'].upper())
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.runs[0].bold = True
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)
     
-    # Espaço
-    doc.add_paragraph()
-    doc.add_paragraph()
+    doc.add_paragraph("\n")
     
-    # =============================
-    # REGISTRO E PUBLICAÇÃO
-    # =============================
-    p_registro = doc.add_paragraph()
-    p_registro.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p_registro.add_run(
+    # ---------------------------------------------------------
+    # REGISTRO E PUBLICAÇÃO + ASSINATURA DA SECRETÁRIA
+    # ---------------------------------------------------------
+    texto_registro = (
         f"         Registrado e publicado na Secretaria Geral da Prefeitura Municipal de {dados['municipio']}, "
-        f"Estado de São Paulo, em {data_extenso}."
+        f"Estado de São Paulo, em {hoje.day} de {meses[hoje.month]} de {hoje.year}."
     )
+    p = doc.add_paragraph(texto_registro)
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)
     
-    # Espaço
-    doc.add_paragraph()
-    doc.add_paragraph()
-    doc.add_paragraph()
+    # 3 linhas em branco
+    doc.add_paragraph("\n\n")
     
-    # =============================
-    # ASSINATURA SECRETÁRIA
-    # =============================
-    p_secretaria = doc.add_paragraph()
-    p_secretaria.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p_secretaria.add_run(dados.get('secretaria', 'RITA DE CÁSSIA CÔRTES FERRAZ'))
-    run.bold = True
-    
-    # =============================
-    # SALVAR
-    # =============================
-    buffer = io.BytesIO()
-    doc.save(buffer)
-    buffer.seek(0)
-    return buffer
+    # Assinatura da secretária
+    p = doc.add_paragraph(dados.get('secretaria', 'RITA DE CÁSSIA CÔRTES FERRAZ').upper())
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.runs[0].bold = True
+    p.runs[0].font.name = 'Times New Roman'
+    p.runs[0].font.size = Pt(12)
+
+    return salvar_docx(doc)
