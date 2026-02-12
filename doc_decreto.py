@@ -24,6 +24,14 @@ def gerar_decreto(dados):
     doc = Document()
     configurar_estilo(doc)
     
+    # Configurar margens oficiais
+    sections = doc.sections
+    for section in sections:
+        section.top_margin = Cm(0.75)
+        section.bottom_margin = Cm(0)
+        section.left_margin = Cm(3.0)
+        section.right_margin = Cm(2.0)
+    
     # ---------------------------------------------------------
     # CABEÇALHO COM BRASÃO
     # ---------------------------------------------------------
@@ -42,11 +50,12 @@ def gerar_decreto(dados):
     p.runs[0].font.size = Pt(14)
     p.runs[0].font.name = 'Times New Roman'
     
-    doc.add_paragraph()  # Espaço
+   # doc.add_paragraph()  # Espaço
     
-    # Ementa
+    # Ementa com recuo de 9cm
     p = doc.add_paragraph(f"Dispõe sobre a autorização para abertura de Crédito Adicional {dados['tipo_lei']}")
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p.paragraph_format.left_indent = Cm(9.0)
     p.runs[0].bold = False
     p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
@@ -59,7 +68,7 @@ def gerar_decreto(dados):
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
-    doc.add_paragraph()  # Espaço
+    #doc.add_paragraph()  # Espaço
     
     p = doc.add_paragraph("         DECRETA:")
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -67,7 +76,7 @@ def gerar_decreto(dados):
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
-    doc.add_paragraph()  # Espaço
+    #doc.add_paragraph()  # Espaço
 
     # ---------------------------------------------------------
     # ARTIGO 1º - CRÉDITOS
@@ -130,8 +139,8 @@ def gerar_decreto(dados):
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
-    doc.add_paragraph()  # Espaço
-    doc.add_paragraph()  # Espaço
+   # doc.add_paragraph()  # Espaço
+    #doc.add_paragraph()  # Espaço
 
     # ---------------------------------------------------------
     # ARTIGO 2º - FONTES
@@ -182,7 +191,7 @@ def gerar_decreto(dados):
         p.runs[0].font.name = 'Times New Roman'
         p.runs[0].font.size = Pt(12)
         
-        doc.add_paragraph()  # Espaço
+       # doc.add_paragraph()  # Espaço
         art_num += 1
     
     # Se houver superávit
@@ -198,27 +207,61 @@ def gerar_decreto(dados):
         p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.runs[0].font.name = 'Times New Roman'
         p.runs[0].font.size = Pt(12)
-        doc.add_paragraph()  # Espaço
+       # doc.add_paragraph()  # Espaço
         art_num += 1
     
     # Se houver excesso de arrecadação
     elif dados['val_exc'] > 0:
-        texto_exc = (
+        # Artigo - Excesso de Arrecadação
+        p = doc.add_paragraph(
             f"         Art.{art_num}º As despesas decorrentes deste decreto serão suportadas com recursos provenientes de "
-            f"excesso de arrecadação, nos termos do inciso II, § 1º, do artigo 43, da Lei nº 4.320, de 17 de março de 1964"
+            f"excesso de arrecadação, nos termos do inciso II, § 1º, do artigo 43, da Lei nº 4.320, de 17 de março de 1964:"
         )
-        
-        if dados.get('origem_recursos'):
-            texto_exc += f", oriundos de {dados['origem_recursos']}"
-        
-        texto_exc += f", no valor de {format_currency(dados['val_exc'])} ({extenso_brl(dados['val_exc'])})."
-        
-        p = doc.add_paragraph(texto_exc)
         p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.runs[0].font.name = 'Times New Roman'
         p.runs[0].font.size = Pt(12)
-        doc.add_paragraph()  # Espaço
+        
+        # Se houver origem dos recursos, criar tabela
+        if dados.get('origem_recursos'):
+            table_exc = doc.add_table(rows=1, cols=3)
+            table_exc.style = 'Table Grid'
+            
+            # Definir larguras das colunas (1:1:2)
+            widths_exc = [Cm(4), Cm(4), Cm(8)]
+            
+            cells = table_exc.rows[0].cells
+            
+            # Coluna 1: Tipo
+            cells[0].paragraphs[0].text = "Excesso de Arrecadação"
+            cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+            
+            # Coluna 2: Valor
+            cells[1].paragraphs[0].text = format_currency(dados['val_exc'])
+            cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            
+            # Coluna 3: Origem
+            cells[2].paragraphs[0].text = dados['origem_recursos']
+            cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+            
+            # Aplicar formatação
+            for idx, width in enumerate(widths_exc):
+                cells[idx].width = width
+                for p in cells[idx].paragraphs:
+                    for r in p.runs:
+                        r.font.size = Pt(10)
+                        r.font.name = 'Times New Roman'
+        else:
+            # Sem origem, apenas texto simples
+            p = doc.add_paragraph(
+                f"         Excesso de Arrecadação no valor de {format_currency(dados['val_exc'])} ({extenso_brl(dados['val_exc'])})."
+            )
+            p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            p.runs[0].font.name = 'Times New Roman'
+            p.runs[0].font.size = Pt(12)
+        
+       # doc.add_paragraph()  # Espaço
         art_num += 1
+
 
     # ---------------------------------------------------------
     # ARTIGO 3º - PPA/LDO
@@ -259,7 +302,7 @@ def gerar_decreto(dados):
     p.runs[0].font.size = Pt(12)
     
     # 3 linhas em branco
-    doc.add_paragraph("\n\n")
+   # doc.add_paragraph("\n\n")
     
     # ---------------------------------------------------------
     # ASSINATURA PREFEITO
@@ -270,7 +313,7 @@ def gerar_decreto(dados):
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
-    doc.add_paragraph("\n")
+    #doc.add_paragraph("\n")
     
     # ---------------------------------------------------------
     # REGISTRO E PUBLICAÇÃO + ASSINATURA DA SECRETÁRIA
@@ -285,7 +328,7 @@ def gerar_decreto(dados):
     p.runs[0].font.size = Pt(12)
     
     # 3 linhas em branco
-    doc.add_paragraph("\n\n")
+    #doc.add_paragraph("\n\n")
     
     # Assinatura da secretária
     p = doc.add_paragraph(dados.get('secretaria', 'RITA DE CÁSSIA CÔRTES FERRAZ').upper())

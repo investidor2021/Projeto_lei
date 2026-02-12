@@ -101,7 +101,7 @@ with st.expander("📄 1. Identificação", expanded=True):
     secretaria = c3.text_input("Secretária", "RITA DE CÁSSIA CÔRTES FERRAZ")
 
     ppa = c1.text_input("PPA", "Lei n.º 5.144, de 21 de outubro de 2025")
-    ldo = c2.text_input("LDO", "Lei n.º 5.112 de 18 de junho de 2025")
+    ldo = c3.text_input("LDO", "Lei n.º 5.112 de 18 de junho de 2025")
 
 # ===============================
 # FONTES DE RECURSO
