@@ -625,38 +625,85 @@ if opcoes_planilha:
 # ===============================
 st.header("📋 5. Resumo")
 
-col1, col2= st.columns(2)
-
-with col1:
-    st.subheader("Créditos")
+# --- CRÉDITOS ---
+st.subheader("Créditos Adicionais")
+if st.session_state.itens_credito:
+    # Cabeçalho da tabela
+    c1, c2, c3 = st.columns([6, 2, 1])
+    c1.markdown("**Descrição**")
+    c2.markdown("**Valor**")
+    c3.markdown("**Ação**")
+    st.markdown("---")
+    
+    # Itens
     for idx, it in enumerate(st.session_state.itens_credito):
-        c1, c2, c3 = st.columns([5, 2, 1])
-        c1.markdown(f"**{it['label']}**")
-        c2.markdown(f"R$ {it['valor']:,.2f}")
+        c1, c2, c3 = st.columns([6, 2, 1])
+        c1.text(it['label'])
+        c2.text(f"R$ {it['valor']:,.2f}")
         if c3.button("❌", key=f"del_credito_{it['id']}"):
             st.session_state.itens_credito.pop(idx)
             st.rerun()
+else:
+    st.info("Nenhum crédito adicionado.")
 
-with col2:
-    st.subheader("Anulações")
+# --- ANULAÇÕES ---
+st.subheader("Anulações de Dotações")
+if st.session_state.itens_anulacao:
+    # Cabeçalho da tabela
+    c1, c2, c3 = st.columns([6, 2, 1])
+    c1.markdown("**Descrição**")
+    c2.markdown("**Valor**")
+    c3.markdown("**Ação**")
+    st.markdown("---")
+    
+    # Itens
     for idx, it in enumerate(st.session_state.itens_anulacao):
-        c1, c2, c3 = st.columns([5, 2, 1])
-        c1.markdown(f"**{it['label']}**")
-        c2.markdown(f"R$ {it['valor']:,.2f}")
+        c1, c2, c3 = st.columns([6, 2, 1])
+        c1.text(it['label'])
+        c2.text(f"R$ {it['valor']:,.2f}")
         if c3.button("❌", key=f"del_anulacao_{it['id']}"):
             st.session_state.itens_anulacao.pop(idx)
             st.rerun()
-        
+else:
+    st.info("Nenhuma anulação adicionada.")
+
+# --- FONTES ---
+st.subheader("💰 Fontes de Recursos Detalhadas")
+
+# Calcular totais
 total_credito = sum(i["valor"] for i in st.session_state.itens_credito)
-total_fontes = sum(i["valor"] for i in st.session_state.itens_anulacao) + val_sup + val_exc        
+total_anulacao = sum(i["valor"] for i in st.session_state.itens_anulacao)
+total_fontes = total_anulacao + val_sup + val_exc
 
-col1    , col2= st.columns(2)
+# Mostrar discriminação das fontes
+if val_sup > 0:
+    c1, c2 = st.columns([6, 2])
+    c1.text("Superávit Financeiro")
+    c2.text(f"R$ {val_sup:,.2f}")
 
-with col1:
-    st.metric("Total de Créditos", f"R$ {total_credito:,.2f}")
+if val_exc > 0:
+    c1, c2 = st.columns([6, 2])
+    c1.text(f"Excesso de Arrecadação ({origem_recursos if origem_recursos else 'Sem origem definida'})")
+    c2.text(f"R$ {val_exc:,.2f}")
 
-with col2:
-    st.metric("Total de Fontes", f"R$ {total_fontes:,.2f}")
+if total_anulacao > 0:
+    c1, c2 = st.columns([6, 2])
+    c1.text("Anulação de Dotações")
+    c2.text(f"R$ {total_anulacao:,.2f}")
+
+st.markdown("---")
+
+# Totais alinhados à direita
+col_espaco, col_totais = st.columns([1, 1])
+
+with col_totais:
+    st.markdown(f"### Total de Créditos: R$ {total_credito:,.2f}")
+    st.markdown(f"### Total de Fontes: R$ {total_fontes:,.2f}")
+    
+    if round(total_credito, 2) == round(total_fontes, 2):
+        st.success("✅ Valores batem!")
+    else:
+        st.error(f"❌ Diferença: R$ {total_credito - total_fontes:,.2f}")
 
 # ===============================
 # JUSTIFICATIVA
