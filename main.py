@@ -239,7 +239,7 @@ with colcred:
 
         with col3:
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("➕ Crédito", use_container_width=True):
+            if st.button("➕", use_container_width=True):
                 if item:
                     novo = {**item, "valor": valor}
                     st.session_state.itens_credito.append(novo)
@@ -583,7 +583,7 @@ with colcred:
         
         with col_btn:
             st.markdown("<br>", unsafe_allow_html=True)
-            adicionar = st.button("➕ Adicionar Crédito", use_container_width=True)
+            adicionar = st.button("➕", use_container_width=True)
         
         if adicionar:
             item_manual = {
@@ -602,7 +602,7 @@ with colcred:
 # ANULAÇÃO (sempre pela planilha)
 # ===============================
 with colanul:
-    st.header("➖ 4. Anulação (sempre pela planilha)")
+    st.header("➖ 4. Anulação")
 
     if opcoes_planilha:
         col1, col2, col3 = st.columns([5,1,1])
@@ -616,7 +616,7 @@ with colanul:
         with col3:
             st.markdown("<br>", unsafe_allow_html=True)
             
-            if st.button("➕ Adicionar Anulação", use_container_width=True):
+            if st.button("➕", use_container_width=True):
                 if item_a:
                     novo = {**item_a, "valor": valor_a}
                     st.session_state.itens_anulacao.append(novo)
@@ -682,28 +682,26 @@ total_credito = sum(i["valor"] for i in st.session_state.itens_credito)
 total_anulacao = sum(i["valor"] for i in st.session_state.itens_anulacao)
 total_fontes = total_anulacao + val_sup + val_exc
 
-# Mostrar discriminação das fontes
-if val_sup > 0:
-    c1, c2 = st.columns([6, 2])
-    c1.text("Superávit Financeiro")
-    c2.text(f"R$ {val_sup:,.2f}")
+col1, col2 = st.columns(2)
 
-if val_exc > 0:
-    c1, c2 = st.columns([6, 2])
-    c1.text(f"Excesso de Arrecadação ({origem_recursos if origem_recursos else 'Sem origem definida'})")
-    c2.text(f"R$ {val_exc:,.2f}")
+with col1:
+    # Mostrar discriminação das fontes
+    if val_sup > 0:
+        c1, c2 = st.columns([6, 2])
+        c1.text("Superávit Financeiro")
+        c2.text(f"R$ {val_sup:,.2f}")
 
-if total_anulacao > 0:
-    c1, c2 = st.columns([6, 2])
+    if val_exc > 0:
+        c1, c2 = st.columns([6, 2])
+        c1.text(f"Excesso de Arrecadação ({origem_recursos if origem_recursos else 'Sem origem definida'})")
+        c2.text(f"R$ {val_exc:,.2f}")
+
+    if total_anulacao > 0:
+        c1, c2 = st.columns([6, 2])
     c1.text("Anulação de Dotações")
     c2.text(f"R$ {total_anulacao:,.2f}")
 
-st.markdown("---")
-
-# Totais alinhados à direita
-col_espaco, col_totais = st.columns([1, 1])
-
-with col_totais:
+with col2:
     st.markdown(f"### Total de Créditos: R$ {total_credito:,.2f}")
     st.markdown(f"### Total de Fontes: R$ {total_fontes:,.2f}")
     
@@ -711,6 +709,8 @@ with col_totais:
         st.success("✅ Valores batem!")
     else:
         st.error(f"❌ Diferença: R$ {total_credito - total_fontes:,.2f}")
+
+st.markdown("---")
 
 # ===============================
 # JUSTIFICATIVA
