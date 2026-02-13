@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import uuid
 import io
+from datetime import date
 
 from doc_projeto_lei import gerar_projeto_lei
 from doc_decreto import gerar_decreto
@@ -88,27 +89,30 @@ def descricao_automatica(dotacao):
 # IDENTIFICAÇÃO
 # ===============================
 with st.expander("📄 1. Identificação", expanded=True):
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3, c4, c5 = st.columns([1,1,1,1,1])
 
     tipo_doc = c1.radio("Tipo do Documento", ["Projeto de Lei", "Lei Finalizada", "Decreto"], horizontal=True)
-    tipo_lei = c2.radio("Tipo de Crédito", ["Suplementar", "Especial"], horizontal=True)
+    tipo_lei = c1.radio("Tipo de Crédito", ["Suplementar", "Especial"], horizontal=True)
 
-    numero = c1.text_input("Número da Lei", placeholder="Ex: 5.182/2026")
+    numero = c2.text_input("Número da Lei", placeholder="Ex: 5.182/2026")
     numero_projeto = c2.text_input("Número do Projeto", placeholder="Ex: 26/2026")
-    municipio = c2.text_input("Município", "Vargem Grande do Sul")
-    prefeito = c3.text_input("Prefeito", "CELSO LUIS RIBEIRO")
+    municipio = c3.text_input("Município", "Vargem Grande do Sul")
+    prefeito = c5.text_input("Prefeito", "CELSO LUIS RIBEIRO")
     
-    secretaria = c3.text_input("Secretária", "RITA DE CÁSSIA CÔRTES FERRAZ")
+    secretaria = c5.text_input("Secretária", "RITA DE CÁSSIA CÔRTES FERRAZ")
 
-    ppa = c1.text_input("PPA", "Lei n.º 5.144, de 21 de outubro de 2025")
-    ldo = c3.text_input("LDO", "Lei n.º 5.112 de 18 de junho de 2025")
+    ppa = c4.text_input("PPA", "Lei n.º 5.144, de 21 de outubro de 2025")
+    ldo = c4.text_input("LDO", "Lei n.º 5.112 de 18 de junho de 2025")
+    
+    # Campo de data
+    data_doc = c3.date_input("Data do Documento", value=date.today())
 
 # ===============================
 # FONTES DE RECURSO
 # ===============================
 st.header("💰 2. Fontes de Recurso")
 
-col_sup, col_exc = st.columns(2)
+col_sup, col_exc, colrec = st.columns([1,1,2])
 
 with col_sup:
     usa_sup = st.checkbox("Superávit Financeiro")
@@ -118,14 +122,23 @@ with col_exc:
     usa_exc = st.checkbox("Excesso de Arrecadação")
     val_exc = st.number_input("Valor Excesso", min_value=0.0, disabled=not usa_exc, format="%.2f")
 
-# Se excesso estiver marcado, mostrar campo de origem
-origem_recursos = ""
-if usa_exc:
-    origem_recursos = st.text_input(
-        "Origem dos Recursos (Excesso de Arrecadação)",
-        placeholder="Ex: Proposta nº 63000724740202600, destinada ao custeio...",
-        help="Informe a origem específica (proposta, convênio, etc.)"
-    )
+with colrec:
+    # Label invisível para alinhar com os checkboxes
+    #st.markdown("&nbsp;", unsafe_allow_html=True)
+    st.write("")
+    st.write("")
+    st.write("")
+    
+    # Se excesso estiver marcado, mostrar campo de origem
+    origem_recursos = ""
+    if usa_exc:
+        origem_recursos = st.text_input(
+            "Origem dos Recursos",
+            placeholder="Ex: Proposta nº 63000724740202600, destinada ao custeio...",
+            help="Informe a origem específica (proposta, convênio, etc.)",
+            label_visibility="visible"
+        )
+
 
 # ===============================
 # PLANILHA
@@ -675,7 +688,8 @@ if st.button("Gerar DOCX"):
             "itens_credito": st.session_state.itens_credito,
             "itens_anulacao": st.session_state.itens_anulacao,
             "total_credito": total_credito,
-            "justificativa": justificativa
+            "justificativa": justificativa,
+            "data_doc": data_doc
         }
 
         if tipo_doc == "Projeto de Lei":

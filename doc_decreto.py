@@ -42,7 +42,7 @@ def gerar_decreto(dados):
     # ---------------------------------------------------------
     meses = {1:'janeiro', 2:'fevereiro', 3:'março', 4:'abril', 5:'maio', 6:'junho',
              7:'julho', 8:'agosto', 9:'setembro', 10:'outubro', 11:'novembro', 12:'dezembro'}
-    hoje = date.today()
+    hoje = dados.get('data_doc', date.today())
     
     p = doc.add_paragraph(f"DECRETO N.º {dados['numero']}, DE {hoje.day} DE {meses[hoje.month].upper()} DE {hoje.year}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
