@@ -326,7 +326,7 @@ if tipo_lei == "Especial":
     # ===== COMPONENTES PRINCIPAIS (sempre visíveis) =====
     st.markdown("### 📋 Componentes Principais")
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4   = st.columns([1,0.75,0.5,0.75])
 
     with col1:
     # Departamento
@@ -337,15 +337,13 @@ if tipo_lei == "Especial":
             format_func=lambda x: next(label for cod, label in opcoes_depto if cod == x),
             key="depto_completo"
         )
-         # Programa
-        opcoes_programa = audesp_codes.obter_opcoes_programa()
-        programa_selecionado = st.selectbox(
-            "Programa",
-            options=[cod for cod, _ in opcoes_programa],
-            format_func=lambda x: next(label for cod, label in opcoes_programa if cod == x),
-            key="programa_completo"
-        )
-    
+        # Número do Projeto/Atividade com opção manual
+        modo_projeto = st.radio(
+            "Projeto/Atividade",
+            options=["Selecionar da lista", "Digitar manualmente"],
+            key="modo_projeto",
+            horizontal=True
+        )    
 
     with col2:
     # Subfunção
@@ -366,13 +364,17 @@ if tipo_lei == "Especial":
             format_func=lambda x: next(label for cod, label in opcoes_funcao if cod == x),
             key="funcao_completo"
         )
-    # Número do Projeto/Atividade com opção manual
-        modo_projeto = st.radio(
-            "Projeto/Atividade",
-            options=["Selecionar da lista", "Digitar manualmente"],
-            key="modo_projeto",
-            horizontal=True
-        )
+
+    with col4:
+         # Programa
+        opcoes_programa = audesp_codes.obter_opcoes_programa()
+        programa_selecionado = st.selectbox(
+            "Programa",
+            options=[cod for cod, _ in opcoes_programa],
+            format_func=lambda x: next(label for cod, label in opcoes_programa if cod == x),
+            key="programa_completo"
+        )    
+    
     
     if modo_projeto == "Selecionar da lista":
         opcoes_num_projeto = [(cod, f"{cod} - {nome}") for cod, nome in sorted(projetos_disponiveis.items())]
