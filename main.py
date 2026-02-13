@@ -624,7 +624,9 @@ if opcoes_planilha:
 # LISTAGEM
 # ===============================
 st.header("📋 5. Resumo")
+colcred, colanul = st.columns(2)
 
+with colcred:
 # --- CRÉDITOS ---
 st.subheader("Créditos Adicionais")
 if st.session_state.itens_credito:
@@ -646,6 +648,7 @@ if st.session_state.itens_credito:
 else:
     st.info("Nenhum crédito adicionado.")
 
+with colanul:
 # --- ANULAÇÕES ---
 st.subheader("Anulações de Dotações")
 if st.session_state.itens_anulacao:
