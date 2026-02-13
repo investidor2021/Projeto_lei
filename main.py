@@ -18,6 +18,7 @@ st.set_page_config(page_title="Gerador Legislativo", layout="wide")
 st.title("🏛️ Gerador de Projetos, Leis e Decretos")
 
 import sheets_client  # [NEW] Importação do client do Sheets
+import audesp_codes
 
 if "itens_credito" not in st.session_state:
     st.session_state.itens_credito = []
@@ -238,7 +239,7 @@ with colcred:
 
         with col3:
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("➕ Adicionar Crédito", use_container_width=True):
+            if st.button("➕ Crédito", use_container_width=True):
                 if item:
                     novo = {**item, "valor": valor}
                     st.session_state.itens_credito.append(novo)
@@ -250,7 +251,7 @@ with colcred:
     #st.subheader("Crédito Especial - Construtor Completo de Dotação AUDESP")
     
     # Importar o módulo de códigos AUDESP
-        import audesp_codes
+        # import audesp_codes
     
      # Carregar dados dinâmicos da planilha
         DEFAULT_SHEET_ID = "1EJN2eziO3rpv2KFavAMIJbD7UQyZZOChGLXt81VTHww"
@@ -395,205 +396,205 @@ with colcred:
                 else:
                     st.warning("Preencha código e nome do projeto")
     
-    # ===== MODO DE ELEMENTO DE DESPESA =====
-    st.markdown("---")
-    st.markdown("### 💰 Elemento de Despesa")
-    
-    modo_elemento = st.radio(
-        "Modo de seleção",
-        options=["Simplificado", "Completo"],
-        horizontal=True,
-        help="Simplificado: código completo pronto. Completo: preencher cada campo separadamente."
-    )
-    
-    if modo_elemento == "Simplificado":
-        # Modo simplificado: elemento, fonte e aplicação em 3 colunas
-        col_elem, col_fonte, col_aplic = st.columns(3)
-        
-        with col_elem:
-            opcoes_elemento_simp = audesp_codes.obter_opcoes_elemento_simplificado()
-            elemento_completo_selecionado = st.selectbox(
-                "Elemento de Despesa (Código Completo)",
-                options=[cod for cod, _ in opcoes_elemento_simp],
-                format_func=lambda x: next(label for cod, label in opcoes_elemento_simp if cod == x),
-                key="elemento_simplificado",
-                help="Código completo no formato Cat.Grupo.Mod.Elem.Desdobr"
-            )
-        
-        with col_fonte:
-            opcoes_fonte = audesp_codes.obter_opcoes_fonte()
-            fonte_selecionada = st.selectbox(
-                "Fonte de Recursos",
-                options=[cod for cod, _ in opcoes_fonte],
-                format_func=lambda x: next(label for cod, label in opcoes_fonte if cod == x),
-                key="fonte_simplificado"
-            )
-        
-        with col_aplic:
-            opcoes_aplicacao = audesp_codes.obter_opcoes_aplicacao()
-            aplicacao_selecionada = st.selectbox(
-                "Código Aplicação",
-                options=[cod for cod, _ in opcoes_aplicacao],
-                format_func=lambda x: next(label for cod, label in opcoes_aplicacao if cod == x),
-                key="aplicacao_simplificado"
-            )
-        
-        # Extrair componentes do código completo
-        # Formato: 3.1.90.11.00 = Cat.Grupo.Mod.Elem.Desdobr
-        partes = elemento_completo_selecionado.split(".")
-        cat_econ_selecionada = partes[0]
-        grupo_desp_selecionado = partes[1]
-        modalidade_selecionada = partes[2]
-        elemento_selecionado = partes[3]
-        desdobramento = ".".join(partes[4:]) if len(partes) > 4 else "00"
-        
-        # Grupo de natureza fixo (Atividade)
-        grupo_nat_selecionado = "3"
-        
-    else:
-        # Modo completo: todos os campos individuais
+        # ===== MODO DE ELEMENTO DE DESPESA =====
         st.markdown("---")
-        st.markdown("### 🔬 Natureza da Despesa")
+        st.markdown("### 💰 Elemento de Despesa")
         
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            # Categoria Econômica
-            opcoes_cat_econ = audesp_codes.obter_opcoes_categoria_economica()
-            cat_econ_selecionada = st.selectbox(
-                "Categoria Econômica",
-                options=[cod for cod, _ in opcoes_cat_econ],
-                format_func=lambda x: next(label for cod, label in opcoes_cat_econ if cod == x),
-                key="cat_econ_completo"
-            )
-            
-            # Grupo de Despesa
-            opcoes_grupo_desp = audesp_codes.obter_opcoes_grupo_despesa()
-            grupo_desp_selecionado = st.selectbox(
-                "Grupo de Despesa",
-                options=[cod for cod, _ in opcoes_grupo_desp],
-                format_func=lambda x: next(label for cod, label in opcoes_grupo_desp if cod == x),
-                key="grupo_desp_completo"
-            )
-        
-        with col2:
-            # Modalidade de Aplicação
-            opcoes_modalidade = audesp_codes.obter_opcoes_modalidade()
-            modalidade_selecionada = st.selectbox(
-                "Modalidade de Aplicação",
-                options=[cod for cod, _ in opcoes_modalidade],
-                format_func=lambda x: next(label for cod, label in opcoes_modalidade if cod == x),
-                key="modalidade_completo",
-                index=list(dict(opcoes_modalidade).keys()).index("90") if "90" in dict(opcoes_modalidade) else 0
-            )
-            
-            # Elemento de Despesa
-            opcoes_elemento = audesp_codes.obter_opcoes_elemento()
-            elemento_selecionado = st.selectbox(
-                "Elemento de Despesa",
-                options=[cod for cod, _ in opcoes_elemento],
-                format_func=lambda x: next(label for cod, label in opcoes_elemento if cod == x),
-                key="elemento_completo"
-            )
-        
-        with col3:
-            # Desdobramento
-            desdobramento = st.text_input(
-                "Desdobramento",
-                value="00.00.00.00.00",
-                key="desdobramento_completo",
-                help="Formato: XX.XX.XX.XX.XX"
-            )
-            
-            # Fonte de Recursos
-            opcoes_fonte = audesp_codes.obter_opcoes_fonte()
-            fonte_selecionada = st.selectbox(
-                "Fonte de Recursos",
-                options=[cod for cod, _ in opcoes_fonte],
-                format_func=lambda x: next(label for cod, label in opcoes_fonte if cod == x),
-                key="fonte_completo"
-            )
-        
-        # Aplicação
-        opcoes_aplicacao = [(cod, f"{cod} - {nome}") for cod, nome in sorted(aplicacoes_disponiveis.items())]
-        aplicacao_selecionada = st.selectbox(
-            "Aplicação",
-            options=[cod for cod, _ in opcoes_aplicacao],
-            format_func=lambda x: next(label for cod, label in opcoes_aplicacao if cod == x),
-            key="aplicacao_completo"
+        modo_elemento = st.radio(
+            "Modo de seleção",
+            options=["Simplificado", "Completo"],
+            horizontal=True,
+            help="Simplificado: código completo pronto. Completo: preencher cada campo separadamente."
         )
         
-        # Grupo de natureza fixo (Atividade)
-        grupo_nat_selecionado = "3"
-    
-    # Compor o código completo
-    dotacao_completa = audesp_codes.compor_dotacao_completa(
-        depto_selecionado,
-        funcao_selecionada,
-        subfuncao_selecionada,
-        programa_selecionado,
-        num_projeto_selecionado,
-        cat_econ_selecionada,
-        grupo_desp_selecionado,
-        modalidade_selecionada,
-        elemento_selecionado,
-        desdobramento,
-        fonte_selecionada,
-        aplicacao_selecionada
-    )
-    
-    # Obter nome do elemento e departamento para descrição
-    if modo_elemento == "Simplificado":
-        # Extrair nome do elemento do código completo
-        elemento_nome = next((nome for cod, nome in audesp_codes.obter_opcoes_elemento_simplificado() if cod == elemento_completo_selecionado), "")
-        # Remover o código do início
-        elemento_nome = elemento_nome.split(" - ", 1)[1] if " - " in elemento_nome else elemento_nome
-    else:
-        # Buscar nome do elemento
-        elemento_nome = audesp_codes.ELEMENTOS_DESPESA_DETALHADOS.get(elemento_selecionado, "")
-    
-    # Buscar nome do departamento
-    depto_nome = audesp_codes.DEPARTAMENTOS.get(depto_selecionado, "")
-    
-    # Montar descrição no formato DOCX
-    descricao_docx = f"{dotacao_completa} - {elemento_nome} - {depto_nome}"
-    
-    # Exibir o código completo e descrição
-    st.markdown("---")
-    st.markdown("### 📋 Código da Dotação Orçamentária Completo")
-    st.code(dotacao_completa, language="text")
-    
-    st.markdown("**📝 Descrição:**")
-    st.info(descricao_docx)
-    
-    # Botão para recarregar dados da planilha
-    if st.button("🔄 Recarregar Projetos e Aplicações"):
-        projetos_sheets = sheets_client.get_projetos_atividades(DEFAULT_SHEET_ID, "projetos")
-        aplicacoes_sheets = sheets_client.get_aplicacoes(DEFAULT_SHEET_ID, "aplicacoes")
-        st.session_state["projetos_atividades"] = projetos_sheets
-        st.session_state["aplicacoes_disponiveis"] = aplicacoes_sheets
-        st.rerun()
-    
-    # Campo de valor e botão de adicionar
-    st.markdown("---")
-    col_valor, col_btn = st.columns([3, 1])
-    with col_valor:
-        valor = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_credito_completo")
-    
-    with col_btn:
-        st.markdown("<br>", unsafe_allow_html=True)
-        adicionar = st.button("➕ Adicionar Crédito", use_container_width=True)
-    
-    if adicionar:
-        item_manual = {
-            "label": descricao_docx,
-            "label_docx": descricao_docx,
-            "id": f"manual-{uuid.uuid4()}",
-            "ficha": dotacao_completa,
-            "valor": valor
-        }
-        st.session_state.itens_credito.append(item_manual)
-        st.success(f"✅ Crédito especial adicionado!\n\n**Código:** {dotacao_completa}")
+        if modo_elemento == "Simplificado":
+            # Modo simplificado: elemento, fonte e aplicação em 3 colunas
+            col_elem, col_fonte, col_aplic = st.columns(3)
+            
+            with col_elem:
+                opcoes_elemento_simp = audesp_codes.obter_opcoes_elemento_simplificado()
+                elemento_completo_selecionado = st.selectbox(
+                    "Elemento de Despesa (Código Completo)",
+                    options=[cod for cod, _ in opcoes_elemento_simp],
+                    format_func=lambda x: next(label for cod, label in opcoes_elemento_simp if cod == x),
+                    key="elemento_simplificado",
+                    help="Código completo no formato Cat.Grupo.Mod.Elem.Desdobr"
+                )
+            
+            with col_fonte:
+                opcoes_fonte = audesp_codes.obter_opcoes_fonte()
+                fonte_selecionada = st.selectbox(
+                    "Fonte de Recursos",
+                    options=[cod for cod, _ in opcoes_fonte],
+                    format_func=lambda x: next(label for cod, label in opcoes_fonte if cod == x),
+                    key="fonte_simplificado"
+                )
+            
+            with col_aplic:
+                opcoes_aplicacao = audesp_codes.obter_opcoes_aplicacao()
+                aplicacao_selecionada = st.selectbox(
+                    "Código Aplicação",
+                    options=[cod for cod, _ in opcoes_aplicacao],
+                    format_func=lambda x: next(label for cod, label in opcoes_aplicacao if cod == x),
+                    key="aplicacao_simplificado"
+                )
+            
+            # Extrair componentes do código completo
+            # Formato: 3.1.90.11.00 = Cat.Grupo.Mod.Elem.Desdobr
+            partes = elemento_completo_selecionado.split(".")
+            cat_econ_selecionada = partes[0]
+            grupo_desp_selecionado = partes[1]
+            modalidade_selecionada = partes[2]
+            elemento_selecionado = partes[3]
+            desdobramento = ".".join(partes[4:]) if len(partes) > 4 else "00"
+            
+            # Grupo de natureza fixo (Atividade)
+            grupo_nat_selecionado = "3"
+            
+        else:
+            # Modo completo: todos os campos individuais
+            st.markdown("---")
+            st.markdown("### 🔬 Natureza da Despesa")
+            
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                # Categoria Econômica
+                opcoes_cat_econ = audesp_codes.obter_opcoes_categoria_economica()
+                cat_econ_selecionada = st.selectbox(
+                    "Categoria Econômica",
+                    options=[cod for cod, _ in opcoes_cat_econ],
+                    format_func=lambda x: next(label for cod, label in opcoes_cat_econ if cod == x),
+                    key="cat_econ_completo"
+                )
+                
+                # Grupo de Despesa
+                opcoes_grupo_desp = audesp_codes.obter_opcoes_grupo_despesa()
+                grupo_desp_selecionado = st.selectbox(
+                    "Grupo de Despesa",
+                    options=[cod for cod, _ in opcoes_grupo_desp],
+                    format_func=lambda x: next(label for cod, label in opcoes_grupo_desp if cod == x),
+                    key="grupo_desp_completo"
+                )
+            
+            with col2:
+                # Modalidade de Aplicação
+                opcoes_modalidade = audesp_codes.obter_opcoes_modalidade()
+                modalidade_selecionada = st.selectbox(
+                    "Modalidade de Aplicação",
+                    options=[cod for cod, _ in opcoes_modalidade],
+                    format_func=lambda x: next(label for cod, label in opcoes_modalidade if cod == x),
+                    key="modalidade_completo",
+                    index=list(dict(opcoes_modalidade).keys()).index("90") if "90" in dict(opcoes_modalidade) else 0
+                )
+                
+                # Elemento de Despesa
+                opcoes_elemento = audesp_codes.obter_opcoes_elemento()
+                elemento_selecionado = st.selectbox(
+                    "Elemento de Despesa",
+                    options=[cod for cod, _ in opcoes_elemento],
+                    format_func=lambda x: next(label for cod, label in opcoes_elemento if cod == x),
+                    key="elemento_completo"
+                )
+            
+            with col3:
+                # Desdobramento
+                desdobramento = st.text_input(
+                    "Desdobramento",
+                    value="00.00.00.00.00",
+                    key="desdobramento_completo",
+                    help="Formato: XX.XX.XX.XX.XX"
+                )
+                
+                # Fonte de Recursos
+                opcoes_fonte = audesp_codes.obter_opcoes_fonte()
+                fonte_selecionada = st.selectbox(
+                    "Fonte de Recursos",
+                    options=[cod for cod, _ in opcoes_fonte],
+                    format_func=lambda x: next(label for cod, label in opcoes_fonte if cod == x),
+                    key="fonte_completo"
+                )
+            
+            # Aplicação
+            opcoes_aplicacao = [(cod, f"{cod} - {nome}") for cod, nome in sorted(aplicacoes_disponiveis.items())]
+            aplicacao_selecionada = st.selectbox(
+                "Aplicação",
+                options=[cod for cod, _ in opcoes_aplicacao],
+                format_func=lambda x: next(label for cod, label in opcoes_aplicacao if cod == x),
+                key="aplicacao_completo"
+            )
+            
+            # Grupo de natureza fixo (Atividade)
+            grupo_nat_selecionado = "3"
+        
+        # Compor o código completo
+        dotacao_completa = audesp_codes.compor_dotacao_completa(
+            depto_selecionado,
+            funcao_selecionada,
+            subfuncao_selecionada,
+            programa_selecionado,
+            num_projeto_selecionado,
+            cat_econ_selecionada,
+            grupo_desp_selecionado,
+            modalidade_selecionada,
+            elemento_selecionado,
+            desdobramento,
+            fonte_selecionada,
+            aplicacao_selecionada
+        )
+        
+        # Obter nome do elemento e departamento para descrição
+        if modo_elemento == "Simplificado":
+            # Extrair nome do elemento do código completo
+            elemento_nome = next((nome for cod, nome in audesp_codes.obter_opcoes_elemento_simplificado() if cod == elemento_completo_selecionado), "")
+            # Remover o código do início
+            elemento_nome = elemento_nome.split(" - ", 1)[1] if " - " in elemento_nome else elemento_nome
+        else:
+            # Buscar nome do elemento
+            elemento_nome = audesp_codes.ELEMENTOS_DESPESA_DETALHADOS.get(elemento_selecionado, "")
+        
+        # Buscar nome do departamento
+        depto_nome = audesp_codes.DEPARTAMENTOS.get(depto_selecionado, "")
+        
+        # Montar descrição no formato DOCX
+        descricao_docx = f"{dotacao_completa} - {elemento_nome} - {depto_nome}"
+        
+        # Exibir o código completo e descrição
+        st.markdown("---")
+        st.markdown("### 📋 Código da Dotação Orçamentária Completo")
+        st.code(dotacao_completa, language="text")
+        
+        st.markdown("**📝 Descrição:**")
+        st.info(descricao_docx)
+        
+        # Botão para recarregar dados da planilha
+        if st.button("🔄 Recarregar Projetos e Aplicações"):
+            projetos_sheets = sheets_client.get_projetos_atividades(DEFAULT_SHEET_ID, "projetos")
+            aplicacoes_sheets = sheets_client.get_aplicacoes(DEFAULT_SHEET_ID, "aplicacoes")
+            st.session_state["projetos_atividades"] = projetos_sheets
+            st.session_state["aplicacoes_disponiveis"] = aplicacoes_sheets
+            st.rerun()
+        
+        # Campo de valor e botão de adicionar
+        st.markdown("---")
+        col_valor, col_btn = st.columns([3, 1])
+        with col_valor:
+            valor = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_credito_completo")
+        
+        with col_btn:
+            st.markdown("<br>", unsafe_allow_html=True)
+            adicionar = st.button("➕ Adicionar Crédito", use_container_width=True)
+        
+        if adicionar:
+            item_manual = {
+                "label": descricao_docx,
+                "label_docx": descricao_docx,
+                "id": f"manual-{uuid.uuid4()}",
+                "ficha": dotacao_completa,
+                "valor": valor
+            }
+            st.session_state.itens_credito.append(item_manual)
+            st.success(f"✅ Crédito especial adicionado!\n\n**Código:** {dotacao_completa}")
 
 
 
