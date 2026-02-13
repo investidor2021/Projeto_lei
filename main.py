@@ -627,48 +627,48 @@ st.header("📋 5. Resumo")
 colcred, colanul = st.columns(2)
 
 with colcred:
-# --- CRÉDITOS ---
-st.subheader("Créditos Adicionais")
-if st.session_state.itens_credito:
-    # Cabeçalho da tabela
-    c1, c2, c3 = st.columns([6, 2, 1])
-    c1.markdown("**Descrição**")
-    c2.markdown("**Valor**")
-    c3.markdown("**Ação**")
-    st.markdown("---")
-    
-    # Itens
-    for idx, it in enumerate(st.session_state.itens_credito):
+    # --- CRÉDITOS ---
+    st.subheader("Créditos Adicionais")
+    if st.session_state.itens_credito:
+        # Cabeçalho da tabela
         c1, c2, c3 = st.columns([6, 2, 1])
-        c1.text(it['label'])
-        c2.text(f"R$ {it['valor']:,.2f}")
-        if c3.button("❌", key=f"del_credito_{it['id']}"):
-            st.session_state.itens_credito.pop(idx)
-            st.rerun()
-else:
-    st.info("Nenhum crédito adicionado.")
+        c1.markdown("**Descrição**")
+        c2.markdown("**Valor**")
+        c3.markdown("**Ação**")
+        st.markdown("---")
+        
+        # Itens
+        for idx, it in enumerate(st.session_state.itens_credito):
+            c1, c2, c3 = st.columns([6, 2, 1])
+            c1.text(it['label'])
+            c2.text(f"R$ {it['valor']:,.2f}")
+            if c3.button("❌", key=f"del_credito_{it['id']}"):
+                st.session_state.itens_credito.pop(idx)
+                st.rerun()
+    else:
+        st.info("Nenhum crédito adicionado.")
 
 with colanul:
-# --- ANULAÇÕES ---
-st.subheader("Anulações de Dotações")
-if st.session_state.itens_anulacao:
-    # Cabeçalho da tabela
-    c1, c2, c3 = st.columns([6, 2, 1])
-    c1.markdown("**Descrição**")
-    c2.markdown("**Valor**")
-    c3.markdown("**Ação**")
-    st.markdown("---")
-    
-    # Itens
-    for idx, it in enumerate(st.session_state.itens_anulacao):
+    # --- ANULAÇÕES ---
+    st.subheader("Anulações de Dotações")
+    if st.session_state.itens_anulacao:
+        # Cabeçalho da tabela
         c1, c2, c3 = st.columns([6, 2, 1])
-        c1.text(it['label'])
-        c2.text(f"R$ {it['valor']:,.2f}")
-        if c3.button("❌", key=f"del_anulacao_{it['id']}"):
-            st.session_state.itens_anulacao.pop(idx)
-            st.rerun()
-else:
-    st.info("Nenhuma anulação adicionada.")
+        c1.markdown("**Descrição**")
+        c2.markdown("**Valor**")
+        c3.markdown("**Ação**")
+        st.markdown("---")
+        
+        # Itens
+        for idx, it in enumerate(st.session_state.itens_anulacao):
+            c1, c2, c3 = st.columns([6, 2, 1])
+            c1.text(it['label'])
+            c2.text(f"R$ {it['valor']:,.2f}")
+            if c3.button("❌", key=f"del_anulacao_{it['id']}"):
+                st.session_state.itens_anulacao.pop(idx)
+                st.rerun()
+    else:
+        st.info("Nenhuma anulação adicionada.")
 
 # --- FONTES ---
 st.subheader("💰 Fontes de Recursos Detalhadas")
