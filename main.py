@@ -324,7 +324,7 @@ if tipo_lei == "Especial":
     st.markdown("---")
 
     # ===== COMPONENTES PRINCIPAIS (sempre visíveis) =====
-    st.markdown("### 📋 Componentes Principais")
+    st.markdown("### 📋 Itens da nova dotação")
 
     col1, col2, col3, col4   = st.columns([1,0.75,0.5,0.75])
 
@@ -337,13 +337,7 @@ if tipo_lei == "Especial":
             format_func=lambda x: next(label for cod, label in opcoes_depto if cod == x),
             key="depto_completo"
         )
-        # Número do Projeto/Atividade com opção manual
-        modo_projeto = st.radio(
-            "Projeto/Atividade",
-            options=["Selecionar da lista", "Digitar manualmente"],
-            key="modo_projeto",
-            horizontal=True
-        )    
+       
 
     with col2:
     # Subfunção
@@ -354,7 +348,8 @@ if tipo_lei == "Especial":
             format_func=lambda x: next(label for cod, label in opcoes_subfuncao if cod == x),
             key="subfuncao_completo"
         )
-    
+
+        
     with col3:
     # Função
         opcoes_funcao = audesp_codes.obter_opcoes_funcao()
@@ -375,74 +370,92 @@ if tipo_lei == "Especial":
             key="programa_completo"
         )    
     
+    col1, col2, col3 = st.columns([2,4,1])
     
-    if modo_projeto == "Selecionar da lista":
-        opcoes_num_projeto = [(cod, f"{cod} - {nome}") for cod, nome in sorted(projetos_disponiveis.items())]
-        num_projeto_selecionado = st.selectbox(
-            "Número Proj/Ativ",
-            options=[cod for cod, _ in opcoes_num_projeto],
-            format_func=lambda x: next(label for cod, label in opcoes_num_projeto if cod == x),
-            key="num_projeto_completo"
-        )
-    else:
-        # Entrada manual
-        col_cod, col_nome = st.columns([1, 2])
-        with col_cod:
-            num_projeto_selecionado = st.text_input(
-                "Código",
-                placeholder="Ex: 2.126",
-                key="num_projeto_manual_cod"
+    with col1:
+         # Número do Projeto/Atividade com opção manual
+        modo_projeto = st.radio(
+            "Projeto/Atividade",
+            options=["Selecionar da lista", "Digitar manualmente"],
+            key="modo_projeto",
+            horizontal=True
+        )    
+    
+    with col2:
+        if modo_projeto == "Selecionar da lista":
+            opcoes_num_projeto = [(cod, f"{cod} - {nome}") for cod, nome in sorted(projetos_disponiveis.items())]
+            num_projeto_selecionado = st.selectbox(
+                "Número Proj/Ativ",
+                options=[cod for cod, _ in opcoes_num_projeto],
+                format_func=lambda x: next(label for cod, label in opcoes_num_projeto if cod == x),
+                key="num_projeto_completo"
             )
-        with col_nome:
-            nome_projeto_manual = st.text_input(
-                "Nome do Projeto/Atividade",
-                placeholder="Ex: Manutenção da Saúde",
-                key="num_projeto_manual_nome"
+        else:
+        # Entrada manual
+            col_cod, col_nome = st.columns([1, 5])
+            with col_cod:
+                num_projeto_selecionado = st.text_input(
+                    "Código",
+                    placeholder="Ex: 2.126",
+                    key="num_projeto_manual_cod"
+            )
+            with col_nome:
+                nome_projeto_manual = st.text_input(
+                    "Nome do Projeto/Atividade",
+                    placeholder="Ex: Manutenção da Saúde",
+                    key="num_projeto_manual_nome"
             )
         
         # Validação: verificar se o código já existe
-        if num_projeto_selecionado and num_projeto_selecionado in projetos_disponiveis:
-            st.info(f"ℹ️ Este código já existe na planilha: **{projetos_disponiveis[num_projeto_selecionado]}**")
-        
+            if num_projeto_selecionado and num_projeto_selecionado in projetos_disponiveis:
+                st.info(f"ℹ️ Este código já existe na planilha: **{projetos_disponiveis[num_projeto_selecionado]}**")
+       
+        with col3:
+            st.write("")
+            st.write("")
         # Botão para salvar na planilha
-        if st.button("💾 Salvar na Planilha", key="salvar_projeto"):
-            if num_projeto_selecionado and nome_projeto_manual:
+            if st.button("💾 Salvar na Planilha", key="salvar_projeto"):
+                if num_projeto_selecionado and nome_projeto_manual:
                 # Verificar novamente se já existe antes de salvar
-                if num_projeto_selecionado in projetos_disponiveis:
-                    st.warning(f"⚠️ Código {num_projeto_selecionado} já existe: {projetos_disponiveis[num_projeto_selecionado]}")
-                else:
-                    try:
+                    if num_projeto_selecionado in projetos_disponiveis:
+                        st.warning(f"⚠️ Código {num_projeto_selecionado} já existe: {projetos_disponiveis[num_projeto_selecionado]}")
+                    else:
+                        try:
                         # Salvar na planilha do Google Sheets
-                        sheets_client.add_projeto_atividade(
-                            DEFAULT_SHEET_ID,
-                            "projetos",
-                            num_projeto_selecionado,
-                            nome_projeto_manual
-                        )
+                            sheets_client.add_projeto_atividade(
+                                DEFAULT_SHEET_ID,
+                                "projetos",
+                                num_projeto_selecionado,
+                                nome_projeto_manual
+                            )
                         # Atualizar session state
-                        st.session_state["projetos_atividades"][num_projeto_selecionado] = nome_projeto_manual
-                        projetos_disponiveis[num_projeto_selecionado] = nome_projeto_manual
-                        st.success(f"✅ Projeto {num_projeto_selecionado} - {nome_projeto_manual} salvo!")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Erro ao salvar: {str(e)}")
-            else:
-                st.warning("Preencha código e nome do projeto")
+                            st.session_state["projetos_atividades"][num_projeto_selecionado] = nome_projeto_manual
+                            projetos_disponiveis[num_projeto_selecionado] = nome_projeto_manual
+                            st.success(f"✅ Projeto {num_projeto_selecionado} - {nome_projeto_manual} salvo!")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Erro ao salvar: {str(e)}")
+                else:
+                    st.warning("Preencha código e nome do projeto")
+    
+    
 
     # ===== MODO DE ELEMENTO DE DESPESA =====
-    st.markdown("---")
-    st.markdown("### 💰 Elemento de Despesa")
+    #st.markdown("---")
     
-    modo_elemento = st.radio(
-        "Modo de seleção",
-        options=["Simplificado", "Completo"],
-        horizontal=True,
-        help="Simplificado: código completo pronto. Completo: preencher cada campo separadamente."
-    )
+    col_modo, col_elem, col_fonte, col_aplic  = st.columns([1,2,0.5,1.5])
+
+    with col_modo:
+        modo_elemento = st.radio(
+            "Modo de seleção",
+            options=["Simplificado", "Completo"],
+            horizontal=True,
+            help="Simplificado: código completo pronto. Completo: preencher cada campo separadamente."
+        )
     
     if modo_elemento == "Simplificado":
         # Modo simplificado: elemento, fonte e aplicação em 3 colunas
-        col_elem, col_fonte, col_aplic = st.columns(3)
+        
         
         with col_elem:
             opcoes_elemento_simp = audesp_codes.obter_opcoes_elemento_simplificado()
@@ -594,11 +607,15 @@ if tipo_lei == "Especial":
 
     # Exibir o código completo e descrição
     st.markdown("---")
-    st.markdown("### 📋 Código da Dotação Orçamentária Completo")
-    st.code(dotacao_completa, language="text")
 
-    st.markdown("**📝 Descrição:**")
-    st.info(descricao_docx)
+    st.markdown("### 📋 Código da Dotação Orçamentária Completo")
+
+    col1, col2, col3= st.columns([5,1,1])
+
+    with col1:
+      st.write("")
+      st.write("")
+      st.info(descricao_docx)
 
     # Botão para recarregar dados da planilha
     if st.button("🔄 Recarregar Projetos e Aplicações"):
@@ -608,13 +625,14 @@ if tipo_lei == "Especial":
         st.session_state["aplicacoes_disponiveis"] = aplicacoes_sheets
         st.rerun()
 
-    # Campo de valor e botão de adicionar
-    st.markdown("---")
-    col_valor, col_btn = st.columns([3, 1])
-    with col_valor:
+    with col2:
+        st.markdown("<br>", unsafe_allow_html=True)        
+
+    #    col_valor, col_btn = st.columns([3, 1])
+    #with col_valor:
         valor = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_credito_completo")
 
-    with col_btn:
+    with col3:
         st.markdown("<br>", unsafe_allow_html=True)
         adicionar = st.button("➕", use_container_width=True, key="btn_add_credito_completo")
 
