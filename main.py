@@ -239,7 +239,7 @@ with colcred:
 
         with col3:
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("➕", use_container_width=True):
+            if st.button("➕", use_container_width=True, key="btn_add_credito_simples"):
                 if item:
                     novo = {**item, "valor": valor}
                     st.session_state.itens_credito.append(novo)
@@ -583,7 +583,7 @@ with colcred:
         
         with col_btn:
             st.markdown("<br>", unsafe_allow_html=True)
-            adicionar = st.button("➕", use_container_width=True)
+            adicionar = st.button("➕", use_container_width=True, key="btn_add_credito_completo")
         
         if adicionar:
             item_manual = {
@@ -616,7 +616,7 @@ with colanul:
         with col3:
             st.markdown("<br>", unsafe_allow_html=True)
             
-            if st.button("➕", use_container_width=True):
+            if st.button("➕", use_container_width=True, key="btn_add_anulacao"):
                 if item_a:
                     novo = {**item_a, "valor": valor_a}
                     st.session_state.itens_anulacao.append(novo)
