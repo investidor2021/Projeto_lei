@@ -230,21 +230,21 @@ with colcred:
 
         col1, col2, col3 = st.columns([5, 1, 1])
 
-    with col1:
-        item = st.selectbox("Escolha a ficha", options=opcoes_planilha, format_func=lambda x: x["label"])
+        with col1:
+            item = st.selectbox("Escolha a ficha", options=opcoes_planilha, format_func=lambda x: x["label"])
 
-    with col2:
-        valor = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_credito")
+        with col2:
+            valor = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_credito")
 
-    with col3:
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("➕ Adicionar Crédito", use_container_width=True):
-            if item:
-                novo = {**item, "valor": valor}
-                st.session_state.itens_credito.append(novo)
-                st.success("Crédito adicionado!")
-            else:
-                st.warning("Selecione uma ficha válida para crédito.")
+        with col3:
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("➕ Adicionar Crédito", use_container_width=True):
+                if item:
+                    novo = {**item, "valor": valor}
+                    st.session_state.itens_credito.append(novo)
+                    st.success("Crédito adicionado!")
+                else:
+                    st.warning("Selecione uma ficha válida para crédito.")
 
     else:
     #st.subheader("Crédito Especial - Construtor Completo de Dotação AUDESP")
