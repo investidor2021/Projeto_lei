@@ -221,12 +221,14 @@ if df_planilha is not None:
 # ===============================
 # CRÉDITO
 # ===============================
-st.header("➕ 3. Crédito")
+colcred, colanul = st.columns(2)
 
-if tipo_lei == "Suplementar":
-    st.subheader("Crédito por ficha da planilha")
+with colcred:
+    st.header("➕ 3. Crédito")
+    if tipo_lei == "Suplementar":
+        st.subheader("Crédito por ficha da planilha")
 
-    col1, col2, col3 = st.columns([5, 1, 1])
+        col1, col2, col3 = st.columns([5, 1, 1])
 
     with col1:
         item = st.selectbox("Escolha a ficha", options=opcoes_planilha, format_func=lambda x: x["label"])
@@ -244,39 +246,39 @@ if tipo_lei == "Suplementar":
             else:
                 st.warning("Selecione uma ficha válida para crédito.")
 
-else:
+    else:
     #st.subheader("Crédito Especial - Construtor Completo de Dotação AUDESP")
     
     # Importar o módulo de códigos AUDESP
-    import audesp_codes
+        import audesp_codes
     
-    # Carregar dados dinâmicos da planilha
-    DEFAULT_SHEET_ID = "1EJN2eziO3rpv2KFavAMIJbD7UQyZZOChGLXt81VTHww"
+     # Carregar dados dinâmicos da planilha
+        DEFAULT_SHEET_ID = "1EJN2eziO3rpv2KFavAMIJbD7UQyZZOChGLXt81VTHww"
     
-    if "projetos_atividades" not in st.session_state:
-        projetos_sheets = sheets_client.get_projetos_atividades(DEFAULT_SHEET_ID, "projetos")
-        st.session_state["projetos_atividades"] = projetos_sheets
+        if "projetos_atividades" not in st.session_state:
+            projetos_sheets = sheets_client.get_projetos_atividades(DEFAULT_SHEET_ID, "projetos")
+            st.session_state["projetos_atividades"] = projetos_sheets
     
-    if "aplicacoes_disponiveis" not in st.session_state:
-        aplicacoes_sheets = sheets_client.get_aplicacoes(DEFAULT_SHEET_ID, "aplicacoes")
-        st.session_state["aplicacoes_disponiveis"] = aplicacoes_sheets
+        if "aplicacoes_disponiveis" not in st.session_state:
+            aplicacoes_sheets = sheets_client.get_aplicacoes(DEFAULT_SHEET_ID, "aplicacoes")
+            st.session_state["aplicacoes_disponiveis"] = aplicacoes_sheets
     
-    projetos_disponiveis = st.session_state.get("projetos_atividades", {})
-    aplicacoes_disponiveis = st.session_state.get("aplicacoes_disponiveis", {})
+        projetos_disponiveis = st.session_state.get("projetos_atividades", {})
+        aplicacoes_disponiveis = st.session_state.get("aplicacoes_disponiveis", {})
     
     # Valores padrão se não houver na planilha
-    if not projetos_disponiveis:
-        projetos_disponiveis = {
-            "0126": "ATIVIDADE - MANUTENÇÃO ADMINISTRATIVA",
-            "0001": "PROJETO - INFRAESTRUTURA",
-            "0051": "ATIVIDADE - MANUTENÇÃO OPERACIONAL"
+        if not projetos_disponiveis:
+            projetos_disponiveis = {
+                "0126": "ATIVIDADE - MANUTENÇÃO ADMINISTRATIVA",
+                "0001": "PROJETO - INFRAESTRUTURA",
+                "0051": "ATIVIDADE - MANUTENÇÃO OPERACIONAL"
         }
     
-    if not aplicacoes_disponiveis:
-        aplicacoes_disponiveis = {
-            "0001": "APLICAÇÃO GERAL",
-            "0265": "APLICAÇÃO FUNDEB",
-            "0100": "APLICAÇÃO SAÚDE"
+        if not aplicacoes_disponiveis:
+            aplicacoes_disponiveis = {
+                "0001": "APLICAÇÃO GERAL",
+                "0265": "APLICAÇÃO FUNDEB",
+                "0100": "APLICAÇÃO SAÚDE"
         }
     
     # Toggle para modo avançado
@@ -285,30 +287,30 @@ else:
     #if not modo_avancado:
     #    st.info("💡 **Modo Simplificado**: Preencha apenas os componentes principais. Os demais usarão valores padrão.")
     
-    st.markdown("---")
+        st.markdown("---")
     
     # ===== COMPONENTES PRINCIPAIS (sempre visíveis) =====
-    st.markdown("### 📋 Componentes Principais")
+        st.markdown("### 📋 Componentes Principais")
     
-    col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4 = st.columns(4)
     
-    with col1:
+        with col1:
         # Departamento
-        opcoes_depto = audesp_codes.obter_opcoes_departamento()
-        depto_selecionado = st.selectbox(
-            "Departamento",
-            options=[cod for cod, _ in opcoes_depto],
+            opcoes_depto = audesp_codes.obter_opcoes_departamento()
+            depto_selecionado = st.selectbox(
+                "Departamento",
+                options=[cod for cod, _ in opcoes_depto],
             format_func=lambda x: next(label for cod, label in opcoes_depto if cod == x),
             key="depto_completo"
         )
         
         
     
-    with col2:
+        with col2:
         # Subfunção
-        opcoes_subfuncao = audesp_codes.obter_opcoes_subfuncao()
-        subfuncao_selecionada = st.selectbox(
-            "Subfunção",
+            opcoes_subfuncao = audesp_codes.obter_opcoes_subfuncao()
+            subfuncao_selecionada = st.selectbox(
+                "Subfunção",
             options=[cod for cod, _ in opcoes_subfuncao],
             format_func=lambda x: next(label for cod, label in opcoes_subfuncao if cod == x),
             key="subfuncao_completo"
@@ -322,21 +324,21 @@ else:
             format_func=lambda x: next(label for cod, label in opcoes_programa if cod == x),
             key="programa_completo"
         )
-    with col3:
+        with col3:
         # Função
-        opcoes_funcao = audesp_codes.obter_opcoes_funcao()
-        funcao_selecionada = st.selectbox(
-            "Função",
+            opcoes_funcao = audesp_codes.obter_opcoes_funcao()
+            funcao_selecionada = st.selectbox(
+                "Função",
             options=[cod for cod, _ in opcoes_funcao],
             format_func=lambda x: next(label for cod, label in opcoes_funcao if cod == x),
             key="funcao_completo"
         )
-    with col4:
+        with col4:
         # Número do Projeto/Atividade com opção manual
-        modo_projeto = st.radio(
-            "Projeto/Atividade",
-            options=["Selecionar da lista", "Digitar manualmente"],
-            key="modo_projeto",
+            modo_projeto = st.radio(
+                "Projeto/Atividade",
+                options=["Selecionar da lista", "Digitar manualmente"],
+                key="modo_projeto",
             horizontal=True
         )
         
@@ -598,27 +600,28 @@ else:
 # ===============================
 # ANULAÇÃO (sempre pela planilha)
 # ===============================
-st.header("➖ 4. Anulação (sempre pela planilha)")
+with colanul:
+    st.header("➖ 4. Anulação (sempre pela planilha)")
 
-if opcoes_planilha:
-    col1, col2, col3 = st.columns([5,1,1])
+    if opcoes_planilha:
+        col1, col2, col3 = st.columns([5,1,1])
 
-    with col1:
-        item_a = st.selectbox("Escolha a ficha para anulação", options=opcoes_planilha, format_func=lambda x: x["label"])
-    
-    with col2:
-        valor_a = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_anulacao")
-
-    with col3:
-        st.markdown("<br>", unsafe_allow_html=True)
+        with col1:
+            item_a = st.selectbox("Escolha a ficha para anulação", options=opcoes_planilha, format_func=lambda x: x["label"])
         
-        if st.button("➕ Adicionar Anulação", use_container_width=True):
-            if item_a:
-                novo = {**item_a, "valor": valor_a}
-                st.session_state.itens_anulacao.append(novo)
-                st.success("Anulação adicionada!")
-            else:
-                st.warning("Selecione uma ficha válida para anulação.")
+        with col2:
+            valor_a = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_anulacao")
+
+        with col3:
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            if st.button("➕ Adicionar Anulação", use_container_width=True):
+                if item_a:
+                    novo = {**item_a, "valor": valor_a}
+                    st.session_state.itens_anulacao.append(novo)
+                    st.success("Anulação adicionada!")
+                else:
+                    st.warning("Selecione uma ficha válida para anulação.")
 
 # ===============================
 # LISTAGEM
