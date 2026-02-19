@@ -68,32 +68,13 @@ st.title("🏛️ Gerador de Projetos, Leis e Decretos")
 import sheets_client  # [NEW] Importação do client do Sheets
 import audesp_codes
 
+from utils import abreviar_texto
+
 if "itens_credito" not in st.session_state:
     st.session_state.itens_credito = []
 if "itens_anulacao" not in st.session_state:
     st.session_state.itens_anulacao = []
 
-def abreviar_texto(texto):
-    """Abrevia termos comuns para caber melhor no documento."""
-    substituicoes = {
-        
-        "MATERIAL DE CONSUMO":"Mat. Cons.",
-        "OUTROS BENEFÍCIOS ASSISTENCIAIS DO SERVIDOR E DO MILITAR":"Outros Ben. Assist. Serv. e Mil.",
-        "VENCIMENTOS E VANTAGENS FIXAS - PESSOAL CIVIL":"Venc. e Vant. - P Civil",
-        "OUTRAS DESPESAS VARIÁVEIS - PESSOAL CIVIL":"Outras Desp. Var. - P Civil",
-        "OUTROS SERVIÇOS DE TERCEIROS - PESSOA FÍSICA":"Outros Serv. Terc. - PF",
-        "OUTROS SERVIÇOS DE TERCEIROS - PESSOA JURÍDICA":"Outros Serv. Terc. - PJ",
-        "SERVIÇOS DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÃO - PESSOA JURÍDICA":"Serv. T.I. e Com. - PJ",
-        "EQUIPAMENTOS E MATERIAL PERMANENTE":"Eq. e Mat. Perm.",
-        "MATERIAL, BEM OU SERVIÇO PARA DISTRIBUIÇÃO GRATUITA":"Mat., Bem ou Serv. para Dist. Grat.",
-        "PRINCIPAL DA DÍVIDA CONTRATUAL RESGATADO":"Princ. da Dívida Contr. Resg.",
-        "JUROS SOBRE A DÍVIDA POR CONTRATO":"Juros s/ a Dívida por Contr.",
-       
-
-    }
-    for original, abreviado in substituicoes.items():
-        texto = texto.replace(original, abreviado)
-    return texto
 
 def formatar_moeda(valor):
     try:
