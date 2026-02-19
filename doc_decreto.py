@@ -6,6 +6,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from doc_base import format_currency, extenso_brl, configurar_estilo, salvar_docx
 import os
+from utils import abreviar_texto
 
 
 def add_coat_of_arms(doc):
@@ -110,6 +111,7 @@ def gerar_decreto(dados):
         
         # Coluna 1: Código - Nome Elemento - Nome Departamento
         texto_completo = item.get('label_docx', item.get('label', ''))
+        texto_completo = abreviar_texto(texto_completo)
         
         c0 = cells[0].paragraphs[0]
         c0.text = texto_completo
@@ -166,6 +168,7 @@ def gerar_decreto(dados):
             cells = row.cells
             
             texto_completo = item.get('label_docx', item.get('label', ''))
+            texto_completo = abreviar_texto(texto_completo)
             cells[0].paragraphs[0].text = texto_completo
             cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
             
