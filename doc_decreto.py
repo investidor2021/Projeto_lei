@@ -111,7 +111,15 @@ def gerar_decreto(dados):
         
         # Coluna 1: Código - Nome Elemento - Nome Departamento
         texto_completo = item.get('label_docx', item.get('label', ''))
-        texto_completo = abreviar_texto(texto_completo)
+        
+        # Tenta extrair código p/ abreviação precisa
+        import re
+        cod_depto = None
+        match = re.search(r'\b(\d{2}\.\d{2}\.\d{2})\b', texto_completo)
+        if match:
+             cod_depto = match.group(1)
+             
+        texto_completo = abreviar_texto(texto_completo, cod_depto=cod_depto)
         
         c0 = cells[0].paragraphs[0]
         c0.text = texto_completo
