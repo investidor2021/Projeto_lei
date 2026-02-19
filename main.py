@@ -99,6 +99,28 @@ def abreviar_texto(texto):
         texto = texto.replace(original, abreviado)
     return texto
 
+def formatar_moeda(valor):
+    try:
+        return f"{float(valor):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except:
+        return "0,00"
+
+def parse_moeda(valor_str):
+    try:
+        if isinstance(valor_str, str):
+            limpo = valor_str.replace("R$", "").replace(" ", "").replace(".", "").replace(",", ".")
+            if not limpo: return 0.0
+            return float(limpo)
+        return float(valor_str)
+    except:
+        return 0.0
+
+def formatar_input(key):
+    val_str = st.session_state.get(key, "")
+    if val_str:
+        val_float = parse_moeda(val_str)
+        st.session_state[key] = formatar_moeda(val_float)
+
 # ===============================
 # FUNÇÕES AUXILIARES
 # ===============================
@@ -165,11 +187,13 @@ col_sup, col_exc, colrec = st.columns([1,1,2])
 
 with col_sup:
     usa_sup = st.checkbox("Superávit Financeiro")
-    val_sup = st.number_input("Valor Superávit", min_value=0.0, disabled=not usa_sup, format="%.2f")
+    val_sup_str = st.text_input("Valor Superávit", value=st.session_state.get("val_sup_str", "0,00"), key="val_sup_str", disabled=not usa_sup, on_change=lambda: formatar_input("val_sup_str"))
+    val_sup = parse_moeda(val_sup_str)
 
 with col_exc:
     usa_exc = st.checkbox("Excesso de Arrecadação")
-    val_exc = st.number_input("Valor Excesso", min_value=0.0, disabled=not usa_exc, format="%.2f")
+    val_exc_str = st.text_input("Valor Excesso", value=st.session_state.get("val_exc_str", "0,00"), key="val_exc_str", disabled=not usa_exc, on_change=lambda: formatar_input("val_exc_str"))
+    val_exc = parse_moeda(val_exc_str)
 
 with colrec:
     # Label invisível para alinhar com os checkboxes
@@ -282,7 +306,8 @@ with colcred:
             item = st.selectbox("Escolha a ficha", options=opcoes_planilha, format_func=lambda x: x["label"])
 
         with col2:
-            valor = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_credito")
+            valor_str = st.text_input("Valor R$", value=st.session_state.get("valor_credito_simples_str", "0,00"), key="valor_credito_simples_str", on_change=lambda: formatar_input("valor_credito_simples_str"))
+            valor = parse_moeda(valor_str)
 
         with col3:
             st.markdown("<br>", unsafe_allow_html=True)
@@ -312,7 +337,8 @@ with colanul:
             item_a = st.selectbox("Escolha a ficha para anulação", options=opcoes_planilha, format_func=lambda x: x["label"])
         
         with col2:
-            valor_a = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_anulacao")
+            valor_a_str = st.text_input("Valor R$", value=st.session_state.get("valor_anulacao_str", "0,00"), key="valor_anulacao_str", on_change=lambda: formatar_input("valor_anulacao_str"))
+            valor_a = parse_moeda(valor_a_str)
 
         with col3:
             st.markdown("<br>", unsafe_allow_html=True)
@@ -669,10 +695,25 @@ if tipo_lei == "Especial":
     with col2:
         st.write("")
         #st.markdown("<br>", unsafe_allow_html=True)        
+        
+        # Função de callback para formatar o valor
+        def formatar_valor():
+            val_str = st.session_state.get("valor_credito_completo_str", "")
+            if val_str:
+                val_float = parse_moeda(val_str)
+                st.session_state["valor_credito_completo_str"] = formatar_moeda(val_float)
 
-    #    col_valor, col_btn = st.columns([3, 1])
-    #with col_valor:
-        valor = st.number_input("Valor", min_value=0.0, format="%.2f", key="valor_credito_completo", label_visibility="collapsed")
+        # Input de texto que formata ao perder o foco (Enter/Tab)
+        valor_str = st.text_input(
+            "Valor", 
+            value="0,00" if "valor_credito_completo_str" not in st.session_state else st.session_state["valor_credito_completo_str"],
+            key="valor_credito_completo_str",
+            on_change=formatar_valor,
+            label_visibility="collapsed"
+        )
+        
+        # Converter para float para uso no backend
+        valor = parse_moeda(valor_str)
 
     with col3:
         st.write("")
