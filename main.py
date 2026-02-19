@@ -234,7 +234,24 @@ def processar_dataframe(df):
             fonte = str(row.iloc[6]).strip()
             aplicacao = str(row.iloc[14]).strip()
             
-            label = f"Ficha: {ficha} - {descricao} {numdespesa}.0{fonte}.{aplicacao} - {abreviar_texto(nomedespesa)} - {abreviar_texto(depto)}"
+            # Tentar extrair o código do departamento de qualquer campo relevante
+            # O usuário informou que o código é tipo "01.02.20"
+            cod_depto = None
+            # Procura em descrição ou ficha (às vezes a ficha tem a info?) 
+            # Ou talvez esteja na coluna 0 (descricao)?
+            import re
+            
+            # Lista de campos para procurar o código do departamento
+            campos_busca = [descricao, ficha] 
+            for campo in campos_busca:
+                match = re.search(r'\b(\d{2}\.\d{2}\.\d{2})\b', campo)
+                if match:
+                    cod_depto = match.group(1)
+                    break
+            
+            depto_abreviado = abreviar_texto(depto, cod_depto=cod_depto)
+            
+            label = f"Ficha: {ficha} - {descricao} {numdespesa}.0{fonte}.{aplicacao} - {abreviar_texto(nomedespesa)} - {depto_abreviado}"
         
             options.append({
                 "label": label,
