@@ -9,6 +9,54 @@ from doc_decreto import gerar_decreto
 from doc_lei_final import gerar_lei_final
 import data_processor
 
+
+st.markdown("""
+<style>
+
+/* Altura padrão para botões */
+div.stButton > button {
+    height: 38px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* Altura padrão para inputs */
+div[data-baseweb="input"] > div {
+    height: 38px;
+    border-radius: 8px;
+}
+
+/* Centralizar conteúdo do st.info */
+div.stAlert {
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+/* Remove espaço extra do number_input */
+div[data-baseweb="input"] input {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+/* Deixa tudo mais alinhado verticalmente */
+div.row-widget.stHorizontal {
+    align-items: center;
+}
+
+/* Botão mais moderno */
+div.stButton > button:hover {
+    transform: scale(1.02);
+    transition: 0.1s ease-in-out;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+
 # ===============================
 # CONFIGURAÇÃO INICIAL
 # ===============================
@@ -610,32 +658,24 @@ if tipo_lei == "Especial":
 
     st.markdown("### 📋 Código da Dotação Orçamentária Completo")
 
-    col1, col2, col3= st.columns([9,2,1])
+    col1, col2, col3, col4  = st.columns([10,2,0.5,0.5])
 
     with col1:
       st.write("")
-      st.write("")
+      
       st.info(descricao_docx)
 
-    # Botão para recarregar dados da planilha
-    if st.button("🔄 Recarregar Projetos e Aplicações"):
-        projetos_sheets = sheets_client.get_projetos_atividades(DEFAULT_SHEET_ID, "projetos")
-        aplicacoes_sheets = sheets_client.get_aplicacoes(DEFAULT_SHEET_ID, "aplicacoes")
-        st.session_state["projetos_atividades"] = projetos_sheets
-        st.session_state["aplicacoes_disponiveis"] = aplicacoes_sheets
-        st.rerun()
-
+    
     with col2:
         st.write("")
         #st.markdown("<br>", unsafe_allow_html=True)        
 
     #    col_valor, col_btn = st.columns([3, 1])
     #with col_valor:
-        valor = st.number_input("", min_value=0.0, format="%.2f", key="valor_credito_completo")
+        valor = st.number_input("Valor", min_value=0.0, format="%.2f", key="valor_credito_completo", label_visibility="collapsed")
 
     with col3:
         st.write("")
-        st.markdown("<br>", unsafe_allow_html=True)
         adicionar = st.button("➕", use_container_width=False, key="btn_add_credito_completo")
 
     if adicionar:
@@ -648,6 +688,20 @@ if tipo_lei == "Especial":
         }
         st.session_state.itens_credito.append(item_manual)
         st.success(f"✅ Crédito especial adicionado!\n\n**Código:** {dotacao_completa}")
+    
+    with col4:
+        st.write("")
+        recarregar = st.button("🔄", use_container_width= False)
+        # Botão para recarregar dados da planilha
+        if recarregar:
+            projetos_sheets = sheets_client.get_projetos_atividades(DEFAULT_SHEET_ID, "projetos")
+            aplicacoes_sheets = sheets_client.get_aplicacoes(DEFAULT_SHEET_ID, "aplicacoes")
+            st.session_state["projetos_atividades"] = projetos_sheets
+            st.session_state["aplicacoes_disponiveis"] = aplicacoes_sheets
+            st.rerun()
+
+
+
 st.header("📋 5. Resumo")
 colcred, colanul = st.columns(2)
 
