@@ -76,23 +76,19 @@ if "itens_anulacao" not in st.session_state:
 def abreviar_texto(texto):
     """Abrevia termos comuns para caber melhor no documento."""
     substituicoes = {
-        "MANUTENÇÃO": "Manut.",
-        "DESENVOLVIMENTO": "Desenv.",        
-        "EDUCAÇÃO": "Educ.",
-        "DEPARTAMENTO": "Depto.",
-        "ENCARGOS": "Enc.",
-        "SERVIÇOS": "Serv.",
-        "INFRAESTRUTURA": "Infra.",
-        "ADMINISTRAÇÃO": "Adm.",
-        "SERVIÇOS":"Serv.",
-        "TERCEIROS":"Terc.",
-        "PESSOA FÍSICA":"PF",
-        "PESSOA JURÍDICA":"PJ",
+        
         "MATERIAL DE CONSUMO":"Mat. Cons.",
         "OUTROS BENEFÍCIOS ASSISTENCIAIS DO SERVIDOR E DO MILITAR":"Outros Ben. Assist. Serv. e Mil.",
         "VENCIMENTOS E VANTAGENS FIXAS - PESSOAL CIVIL":"Venc. e Vant. - P Civil",
-        "DE":"de"
-
+        "OUTRAS DESPESAS VARIÁVEIS - PESSOAL CIVIL":"Outras Desp. Var. - P Civil",
+        "OUTROS SERVIÇOS DE TERCEIROS - PESSOA FÍSICA":"Outros Serv. Terc. - PF",
+        "OUTROS SERVIÇOS DE TERCEIROS - PESSOA JURÍDICA":"Outros Serv. Terc. - PJ",
+        "SERVIÇOS DE TECNOLOGIA DA INFORMAÇÃO E COMUNICAÇÃO - PESSOA JURÍDICA":"Serv. T.I. e Com. - PJ",
+        "EQUIPAMENTOS E MATERIAL PERMANENTE":"Eq. e Mat. Perm.",
+        "MATERIAL, BEM OU SERVIÇO PARA DISTRIBUIÇÃO GRATUITA":"Mat., Bem ou Serv. para Dist. Grat.",
+        "PRINCIPAL DA DÍVIDA CONTRATUAL RESGATADO":"Princ. da Dívida Contr. Resg.",
+        "JUROS SOBRE A DÍVIDA POR CONTRATO":"Juros s/ a Dívida por Contr.",
+       
 
     }
     for original, abreviado in substituicoes.items():
