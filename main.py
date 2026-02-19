@@ -610,7 +610,7 @@ if tipo_lei == "Especial":
 
     st.markdown("### 📋 Código da Dotação Orçamentária Completo")
 
-    col1, col2, col3= st.columns([5,1,1])
+    col1, col2, col3= st.columns([9,2,1])
 
     with col1:
       st.write("")
@@ -626,15 +626,17 @@ if tipo_lei == "Especial":
         st.rerun()
 
     with col2:
-        st.markdown("<br>", unsafe_allow_html=True)        
+        st.write("")
+        #st.markdown("<br>", unsafe_allow_html=True)        
 
     #    col_valor, col_btn = st.columns([3, 1])
     #with col_valor:
-        valor = st.number_input("Valor R$", min_value=0.0, format="%.2f", key="valor_credito_completo")
+        valor = st.number_input("", min_value=0.0, format="%.2f", key="valor_credito_completo")
 
     with col3:
+        st.write("")
         st.markdown("<br>", unsafe_allow_html=True)
-        adicionar = st.button("➕", use_container_width=True, key="btn_add_credito_completo")
+        adicionar = st.button("➕", use_container_width=False, key="btn_add_credito_completo")
 
     if adicionar:
         item_manual = {
@@ -717,8 +719,8 @@ with col1:
 
     if total_anulacao > 0:
         c1, c2 = st.columns([6, 2])
-    c1.text("Anulação de Dotações")
-    c2.text(f"R$ {total_anulacao:,.2f}")
+        c1.text("Anulação de Dotações")
+        c2.text(f"R$ {total_anulacao:,.2f}")
 
 with col2:
     st.markdown(f"### Total de Créditos: R$ {total_credito:,.2f}")
