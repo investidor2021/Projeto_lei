@@ -300,7 +300,7 @@ with colcred:
     st.header("➕ 3. Crédito")
     if tipo_lei == "Suplementar":
        
-        col1, col2, col3 = st.columns([5, 1, 1])
+        col1, col2, col3, col4 = st.columns([6, 2, 0.5, 0.5])
 
         with col1:
             item = st.selectbox("Escolha a ficha", options=opcoes_planilha, format_func=lambda x: x["label"])
@@ -311,13 +311,17 @@ with colcred:
 
         with col3:
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("➕", use_container_width=False, key="btn_add_credito_simples"):
-                if item:
-                    novo = {**item, "valor": valor}
-                    st.session_state.itens_credito.append(novo)
-                    #st.success("Crédito adicionado!")
-                else:
-                    #st.warning("Selecione uma ficha válida para crédito.")
+            adicionar = st.button("➕", use_container_width=False, key="btn_add_credito_simples")
+
+        if adicionar:
+            if item:
+                novo = {**item, "valor": valor}
+                st.session_state.itens_credito.append(novo)
+                with col4:
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.markdown("✅")
+            else:
+                st.warning("Selecione uma ficha válida para crédito.")
 
     else:
         st.info("Preencha os dados abaixo.")
@@ -331,7 +335,7 @@ with colanul:
     st.header("➖ 4. Anulação")
 
     if opcoes_planilha:
-        col1, col2, col3 = st.columns([5,1,1])
+        col1, col2, col3, col4 = st.columns([6,2,0.5,0.5])
 
         with col1:
             item_a = st.selectbox("Escolha a ficha para anulação", options=opcoes_planilha, format_func=lambda x: x["label"])
@@ -342,14 +346,17 @@ with colanul:
 
         with col3:
             st.markdown("<br>", unsafe_allow_html=True)
+            adicionar_a = st.button("➕", use_container_width=False, key="btn_add_anulacao")
             
-            if st.button("➕", use_container_width=False, key="btn_add_anulacao"):
-                if item_a:
-                    novo = {**item_a, "valor": valor_a}
-                    st.session_state.itens_anulacao.append(novo)
-                    #st.success("Anulação adicionada!")
-                else:
-                    #st.warning("Selecione uma ficha válida para anulação.")
+        if adicionar_a:
+            if item_a:
+                novo = {**item_a, "valor": valor_a}
+                st.session_state.itens_anulacao.append(novo)
+                with col4:
+                    st.markdown("<br>", unsafe_allow_html=True) 
+                    st.markdown("✅")
+            else:
+                st.warning("Selecione uma ficha válida para anulação.")
 
 # ===============================
 # CRÉDITO ESPECIAL (FULL WIDTH)
@@ -821,7 +828,7 @@ with col2:
     st.markdown(f"### Total de Créditos: R$ {total_credito:,.2f}")
     st.markdown(f"### Total de Fontes: R$ {total_fontes:,.2f}")
     
-    if round(total_credito, 2) == round(total_fontes, 2):
+    if round(float(total_credito), 2) == round(float(total_fontes), 2):
         st.success("✅ Valores batem!")
     else:
         st.error(f"❌ Diferença: R$ {total_credito - total_fontes:,.2f}")
@@ -840,7 +847,7 @@ justificativa = st.text_area("Digite a justificativa")
 st.header("📥 7. Gerar Documento")
 
 if st.button("Gerar DOCX"):
-    if round(total_credito, 2) != round(total_fontes, 2):
+    if round(float(total_credito), 2) != round(float(total_fontes), 2):
         st.error("Os valores de crédito e fontes não batem. O financeiro surtou.")
     else:
         dados = {
