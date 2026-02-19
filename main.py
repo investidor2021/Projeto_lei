@@ -277,7 +277,7 @@ with colcred:
     st.header("➕ 3. Crédito")
     if tipo_lei == "Suplementar":
        
-        col1, col2, col3, col4 = st.columns([6, 2, 0.5, 0.5])
+        col1, col2, col3, col4 = st.columns([6, 2, 0.75, 0.75])
 
         with col1:
             item = st.selectbox("Escolha a ficha", options=opcoes_planilha, format_func=lambda x: x["label"])
@@ -312,7 +312,7 @@ with colanul:
     st.header("➖ 4. Anulação")
 
     if opcoes_planilha:
-        col1, col2, col3, col4 = st.columns([6,2,0.5,0.5])
+        col1, col2, col3, col4 = st.columns([6,2,0.75,0.75])
 
         with col1:
             item_a = st.selectbox("Escolha a ficha para anulação", options=opcoes_planilha, format_func=lambda x: x["label"])
