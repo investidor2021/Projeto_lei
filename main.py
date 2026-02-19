@@ -315,9 +315,9 @@ with colcred:
                 if item:
                     novo = {**item, "valor": valor}
                     st.session_state.itens_credito.append(novo)
-                    st.success("Crédito adicionado!")
+                    #st.success("Crédito adicionado!")
                 else:
-                    st.warning("Selecione uma ficha válida para crédito.")
+                    #st.warning("Selecione uma ficha válida para crédito.")
 
     else:
         st.info("Preencha os dados abaixo.")
@@ -347,9 +347,9 @@ with colanul:
                 if item_a:
                     novo = {**item_a, "valor": valor_a}
                     st.session_state.itens_anulacao.append(novo)
-                    st.success("Anulação adicionada!")
+                    #st.success("Anulação adicionada!")
                 else:
-                    st.warning("Selecione uma ficha válida para anulação.")
+                    #st.warning("Selecione uma ficha válida para anulação.")
 
 # ===============================
 # CRÉDITO ESPECIAL (FULL WIDTH)
