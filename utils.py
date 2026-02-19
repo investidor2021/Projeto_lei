@@ -14,13 +14,11 @@ def abreviar_texto(texto, cod_depto=None):
 
     # 2. Tentar encontrar o código do departamento no texto (ex: 01.02.01)
     # O código geralmente está no início ou faz parte da string de dotação
-    if not cod_depto:
-        match_depto = re.search(r'\b(\d{2}\.\d{2}\.\d{2})\b', texto)
-        if match_depto:
-            codigo = match_depto.group(1)
-            if codigo in DEPARTAMENTOS:
-                 return DEPARTAMENTOS[codigo]
-
+    # 2. Tentar encontrar o código do departamento no texto (ex: 01.02.01)
+    # Mas NÃO retornar direto, pois isso apaga o resto do texto.
+    # Apenas usamos isso se quisermos fazer substituições inteligentes no futuro.
+    # Por enquanto, o 'match_depto' abaixo não está sendo usado para replacement direto da string toda.
+    
     substituicoes = {
         "MATERIAL DE CONSUMO":"Mat. Cons.",
         "OUTROS BENEFÍCIOS ASSISTENCIAIS DO SERVIDOR E DO MILITAR":"Outros Ben. Assist. Serv. e Mil.",
@@ -35,7 +33,6 @@ def abreviar_texto(texto, cod_depto=None):
         "JUROS SOBRE A DÍVIDA POR CONTRATO":"Juros s/ a Dívida por Contr.",
         
         # Mapeamento Reverso (Nome Completo -> Abreviação)
-        # Importante: O texto de entrada deve conter esses nomes exatos para a substituição funcionar.
         "GABINETE PREFEITO DEPENDÊNCIAS": "Gab. Prefeito Depend.",
         "PROCURADORIA JURIDICA": "Procuradoria Jurídica",
         "DEPTO DE ADMINISTRACÃO": "Depto. Adm.",
@@ -69,27 +66,8 @@ def abreviar_texto(texto, cod_depto=None):
         "FUNDO DE PREVIDÊNCIA DOS SERVIDORES MUNICIPAIS": "Fundo Prev. Serv. Mun."
     }
 
-    # Adicionar lógica de substituição extra baseada no código, se o texto contiver o código
-    if match_depto:
-        codigo = match_depto.group(1)
-        if codigo in DEPARTAMENTOS:
-             # Aqui temos um problema: como substituir o nome antigo pelo novo se não sabemos EXATAMENTE como o nome antigo está escrito?
-             # O usuário diz: "o sistema tem que extrair o codigo do departamento para conseguir ajustar o nome"
-             # Se o texto for "01.02.20 - MATERIAL DE CONSUMO - FUNDO MUNICIPAL DE SAUDE"
-             # E a gente sabe que 01.02.20 é "Fundo Mun. Saúde"
-             # A gente poderia tentar remover o nome antigo usando regex ou similar, mas é arriscado.
-             
-             # Melhor abordagem: Se a gente tem a lista de nomes que mapeiam para este código, a gente tenta substituir todos.
-             # Mas não temos essa lista invertida aqui.
-             pass
-
     for original, abreviado in substituicoes.items():
         if original in texto:
              texto = texto.replace(original, abreviado)
              
-    # TENTATIVA FINAL DE RESGATE PELA SINTAXE DO CÓDIGO
-    # Se o texto contém o código (ex: 01.02.20), e depois das substituições ainda NÃO contém o nome abreviado,
-    # significa que a substituição falhou (provavelmente grafia diferente).
-    # Nesse caso, podemos tentar forçar um append ou replace se identificarmos o padrão.
-    
     return texto
