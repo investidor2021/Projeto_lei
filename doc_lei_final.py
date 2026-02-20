@@ -232,8 +232,8 @@ def gerar_lei_final(dados):
     remover_bordas_tabela(table)
 
     if tem_ficha:
-        widths = [Cm(0.75), Cm(11.5), Cm(2.5)]
-        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[0.75, 11.5, 2.5])
+        widths = [Cm(0.75), Cm(12.75), Cm(2.5)]
+        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[0.75, 12.75, 2.5])
     else:
         widths = [Cm(13.5), Cm(2.5)]
         fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
