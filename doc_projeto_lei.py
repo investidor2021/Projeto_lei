@@ -22,7 +22,7 @@ def add_coat_of_arms(doc):
     p_brasao = doc.add_paragraph()
     p_brasao.alignment = WD_ALIGN_PARAGRAPH.CENTER
     run = p_brasao.add_run()
-    run.add_picture(brasao_path, width=Cm(4.5))  # Ajustar tamanho conforme necessário
+    run.add_picture(brasao_path, width=Cm(4.0), height=Cm(3.82))  # Ajustar tamanho conforme necessário
     
 
 def remover_bordas_tabela(table):
