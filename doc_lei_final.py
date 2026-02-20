@@ -221,53 +221,70 @@ def gerar_lei_final(dados):
     p.runs[0].font.size = Pt(12)
 
     # ---------------------------------------------------------
-    # TABELA DE DOTAÇÕES (formato: código - elemento - departamento)
+    # TABELA DE DOTAÇÕES
     # ---------------------------------------------------------
-    # Criar tabela com 2 colunas
-    table = doc.add_table(rows=0, cols=2)
+    # Detectar se os itens vêm da planilha (têm 'ficha')
+    tem_ficha = any(str(item.get('ficha', '')).strip() for item in dados['itens_credito'])
+    num_cols = 3 if tem_ficha else 2
+
+    table = doc.add_table(rows=0, cols=num_cols)
     table.style = "Table Grid"
     remover_bordas_tabela(table)
-    
-    # Larguras: total = 13.5 + 2.5 = 16.0 cm (= area util com margens 3.0 + 2.0)
-    widths = [Cm(13.5), Cm(2.5)]
-    fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
-    
+
+    if tem_ficha:
+        widths = [Cm(2.0), Cm(11.5), Cm(2.5)]
+        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[2.0, 11.5, 2.5])
+    else:
+        widths = [Cm(13.5), Cm(2.5)]
+        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
+
     # Preencher itens
     for item in dados['itens_credito']:
         row = table.add_row()
         cells = row.cells
-        
-        # Coluna 1: Código - Nome Elemento - Nome Departamento
-        # O label_docx já vem no formato correto do main.py
-        texto_completo = item.get('label_docx', item.get('label', ''))
-        
-        c0 = cells[0].paragraphs[0]
-        c0.text = texto_completo
-        c0.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        
-        # Coluna 2: Valor
-        c1 = cells[1].paragraphs[0]
-        c1.text = format_currency(item.get('valor', 0))
-        c1.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        
-        # Ajuste de fonte para caber (8pt)
+        label_full = item.get('label_docx', item.get('label', ''))
+
+        if tem_ficha:
+            ficha_val = str(item.get('ficha', '')).strip()
+            prefix = f"{ficha_val} - "
+            descricao_val = label_full[len(prefix):] if label_full.startswith(prefix) else label_full
+            cells[0].paragraphs[0].text = ficha_val
+            cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+            cells[1].paragraphs[0].text = descricao_val
+            cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+            cells[2].paragraphs[0].text = format_currency(item.get('valor', 0))
+            cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        else:
+            cells[0].paragraphs[0].text = label_full
+            cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+            cells[1].paragraphs[0].text = format_currency(item.get('valor', 0))
+            cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+        # Ajuste de fonte (8pt)
         for c in cells:
             for p in c.paragraphs:
                 for r in p.runs:
                     r.font.size = Pt(8)
                     r.font.name = 'Times New Roman'
-    
+
     # Aplicar larguras
     for row in table.rows:
         for idx, width in enumerate(widths):
             row.cells[idx].width = width
-    
-    # Total — linha dentro da tabela para alinhar com a coluna de valores
+
+    # Total — última linha da tabela
     row_total = table.add_row()
-    row_total.cells[0].paragraphs[0].text = "Total"
-    row_total.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    row_total.cells[1].paragraphs[0].text = format_currency(dados['total_credito'])
-    row_total.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    if tem_ficha:
+        row_total.cells[0].paragraphs[0].text = ""
+        row_total.cells[1].paragraphs[0].text = "Total"
+        row_total.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        row_total.cells[2].paragraphs[0].text = format_currency(dados['total_credito'])
+        row_total.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    else:
+        row_total.cells[0].paragraphs[0].text = "Total"
+        row_total.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        row_total.cells[1].paragraphs[0].text = format_currency(dados['total_credito'])
+        row_total.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
     for c in row_total.cells:
         for p in c.paragraphs:
             for r in p.runs:

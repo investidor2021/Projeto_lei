@@ -191,52 +191,68 @@ def gerar_projeto_lei(dados):
     # ---------------------------------------------------------
     # TABELA DE DOTAÇÕES (formato: código - elemento - departamento)
     # ---------------------------------------------------------
-    # Criar tabela com 2 colunas
-    table = doc.add_table(rows=0, cols=2)
+    # Detectar se os itens vêm da planilha (têm 'ficha')
+    tem_ficha = any(str(item.get('ficha', '')).strip() for item in dados['itens_credito'])
+    num_cols = 3 if tem_ficha else 2
+
+    table = doc.add_table(rows=0, cols=num_cols)
     table.style = "Table Grid"
     remover_bordas_tabela(table)
-    
-    # Larguras: total = 16.0 cm (area util A4 com margens 3.0 + 2.0)
-    widths = [Cm(13.5), Cm(2.5)]
-    fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
-    
+
+    if tem_ficha:
+        widths = [Cm(2.0), Cm(11.5), Cm(2.5)]
+        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[2.0, 11.5, 2.5])
+    else:
+        widths = [Cm(13.5), Cm(2.5)]
+        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
+
     # Preencher itens
     for item in dados['itens_credito']:
         row = table.add_row()
         cells = row.cells
-        
-        # Coluna 1: Código - Nome Elemento - Nome Departamento
-        # O label_docx já vem no formato correto do main.py
-        texto_completo = item.get('label_docx', item.get('label', ''))
-        texto_completo = abreviar_texto(texto_completo)
-        
-        c0 = cells[0].paragraphs[0]
-        c0.text = texto_completo
-        c0.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        
-        # Coluna 2: Valor
-        c1 = cells[1].paragraphs[0]
-        c1.text = format_currency(item.get('valor', 0))
-        c1.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        
-        # Ajuste de fonte para caber (8pt)
+        label_full = item.get('label_docx', item.get('label', ''))
+        label_full = abreviar_texto(label_full)
+
+        if tem_ficha:
+            ficha_val = str(item.get('ficha', '')).strip()
+            prefix = f"{ficha_val} - "
+            descricao_val = label_full[len(prefix):] if label_full.startswith(prefix) else label_full
+            cells[0].paragraphs[0].text = ficha_val
+            cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+            cells[1].paragraphs[0].text = descricao_val
+            cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+            cells[2].paragraphs[0].text = format_currency(item.get('valor', 0))
+            cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        else:
+            cells[0].paragraphs[0].text = label_full
+            cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+            cells[1].paragraphs[0].text = format_currency(item.get('valor', 0))
+            cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
         for c in cells:
             for p in c.paragraphs:
                 for r in p.runs:
                     r.font.size = Pt(8)
                     r.font.name = 'Times New Roman'
-    
+
     # Aplicar larguras
     for row in table.rows:
         for idx, width in enumerate(widths):
             row.cells[idx].width = width
-        
+
     # Total — última linha da tabela
     row_total = table.add_row()
-    row_total.cells[0].paragraphs[0].text = "Total"
-    row_total.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    row_total.cells[1].paragraphs[0].text = format_currency(dados['total_credito'])
-    row_total.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    if tem_ficha:
+        row_total.cells[0].paragraphs[0].text = ""
+        row_total.cells[1].paragraphs[0].text = "Total"
+        row_total.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        row_total.cells[2].paragraphs[0].text = format_currency(dados['total_credito'])
+        row_total.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    else:
+        row_total.cells[0].paragraphs[0].text = "Total"
+        row_total.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        row_total.cells[1].paragraphs[0].text = format_currency(dados['total_credito'])
+        row_total.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
     for c in row_total.cells:
         for p in c.paragraphs:
             for r in p.runs:
@@ -308,39 +324,60 @@ def gerar_projeto_lei(dados):
         p.runs[0].font.size = Pt(12)
         
         # Tabela de anulação
-        table_a = doc.add_table(rows=0, cols=2)
+        tem_ficha_a = any(str(i.get('ficha', '')).strip() for i in dados['itens_anulacao'])
+        num_cols_a = 3 if tem_ficha_a else 2
+        table_a = doc.add_table(rows=0, cols=num_cols_a)
         table_a.style = 'Table Grid'
         remover_bordas_tabela(table_a)
-        fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
-        
+        if tem_ficha_a:
+            widths_a = [Cm(2.0), Cm(11.5), Cm(2.5)]
+            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[2.0, 11.5, 2.5])
+        else:
+            widths_a = [Cm(13.5), Cm(2.5)]
+            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
+
         for item in dados['itens_anulacao']:
             row = table_a.add_row()
             cells = row.cells
-            
-            texto_completo = item.get('label_docx', item.get('label', ''))
-            cells[0].paragraphs[0].text = texto_completo
-            cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-            
-            cells[1].paragraphs[0].text = format_currency(item.get('valor', 0))
-            cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
-            
+            label_full_a = item.get('label_docx', item.get('label', ''))
+            if tem_ficha_a:
+                ficha_val_a = str(item.get('ficha', '')).strip()
+                prefix_a = f"{ficha_val_a} - "
+                desc_a = label_full_a[len(prefix_a):] if label_full_a.startswith(prefix_a) else label_full_a
+                cells[0].paragraphs[0].text = ficha_val_a
+                cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+                cells[1].paragraphs[0].text = desc_a
+                cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+                cells[2].paragraphs[0].text = format_currency(item.get('valor', 0))
+                cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            else:
+                cells[0].paragraphs[0].text = label_full_a
+                cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+                cells[1].paragraphs[0].text = format_currency(item.get('valor', 0))
+                cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
             for c in cells:
                 for p in c.paragraphs:
                     for r in p.runs:
                         r.font.size = Pt(8)
                         r.font.name = 'Times New Roman'
-        
-        # Aplicar larguras
+
         for row in table_a.rows:
-            for idx, width in enumerate(widths):
+            for idx, width in enumerate(widths_a):
                 row.cells[idx].width = width
-        
+
         # Total da anulação — última linha da tabela
         row_total_a = table_a.add_row()
-        row_total_a.cells[0].paragraphs[0].text = "Total"
-        row_total_a.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        row_total_a.cells[1].paragraphs[0].text = format_currency(total_anul)
-        row_total_a.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        if tem_ficha_a:
+            row_total_a.cells[0].paragraphs[0].text = ""
+            row_total_a.cells[1].paragraphs[0].text = "Total"
+            row_total_a.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            row_total_a.cells[2].paragraphs[0].text = format_currency(total_anul)
+            row_total_a.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        else:
+            row_total_a.cells[0].paragraphs[0].text = "Total"
+            row_total_a.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            row_total_a.cells[1].paragraphs[0].text = format_currency(total_anul)
+            row_total_a.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
         for c in row_total_a.cells:
             for p in c.paragraphs:
                 for r in p.runs:
@@ -414,7 +451,7 @@ def gerar_projeto_lei(dados):
     if dados.get("justificativa"):
         doc.add_page_break()
         p = doc.add_paragraph("JUSTIFICATIVA")
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.runs[0].bold = True
         p.runs[0].font.name = 'Times New Roman'
         p.runs[0].font.size = Pt(14)
