@@ -44,6 +44,23 @@ def remover_bordas_tabela(table):
     tblPr.append(tblBorders)
 
 
+def fixar_largura_tabela(table):
+    """Forca layout fixo na tabela para o Word respeitar as larguras das colunas."""
+    tbl = table._tbl
+    tblPr = tbl.find(qn('w:tblPr'))
+    if tblPr is None:
+        tblPr = OxmlElement('w:tblPr')
+        tbl.insert(0, tblPr)
+    # Remove layout existente se houver
+    existing_layout = tblPr.find(qn('w:tblLayout'))
+    if existing_layout is not None:
+        tblPr.remove(existing_layout)
+    # Inserir layout fixo
+    tblLayout = OxmlElement('w:tblLayout')
+    tblLayout.set(qn('w:type'), 'fixed')
+    tblPr.append(tblLayout)
+
+
 def classify_expense_type(itens_credito):
     """
     Classifica as despesas em 'de capital', 'de custeio' ou ambas.
@@ -178,9 +195,10 @@ def gerar_lei_final(dados):
     table = doc.add_table(rows=0, cols=2)
     table.style = "Table Grid"
     remover_bordas_tabela(table)
+    fixar_largura_tabela(table)
     
-    # Definindo larguras
-    widths = [Cm(13.94), Cm(2.5)]
+    # Larguras: total = 13.5 + 2.5 = 16.0 cm (= area util com margens 3.0 + 2.0)
+    widths = [Cm(13.5), Cm(2.5)]
     
     # Preencher itens
     for item in dados['itens_credito']:
@@ -229,7 +247,9 @@ def gerar_lei_final(dados):
     # ARTIGO 2º - FONTES (EXCESSO OU SUPERÁVIT)
     # ---------------------------------------------------------
     art_num = 2
-    
+
+    doc.add_paragraph()  # Espaço
+
     if dados['val_exc'] > 0:
         # Texto base
         texto_exc = (
@@ -286,6 +306,7 @@ def gerar_lei_final(dados):
         table_a = doc.add_table(rows=0, cols=2)
         table_a.style = 'Table Grid'
         remover_bordas_tabela(table_a)
+        fixar_largura_tabela(table_a)
         
         for item in dados['itens_anulacao']:
             row = table_a.add_row()
