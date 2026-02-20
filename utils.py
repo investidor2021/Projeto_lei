@@ -67,7 +67,9 @@ def abreviar_texto(texto, cod_depto=None):
     }
 
     for original, abreviado in substituicoes.items():
-        if original in texto:
-             texto = texto.replace(original, abreviado)
+        # Case-insensitive match: funciona tanto para texto em caps (planilha)
+        # quanto para texto em mixed case (ELEMENTOS_DESPESA_DETALHADOS)
+        if original.upper() in texto.upper():
+            texto = re.sub(re.escape(original), abreviado, texto, flags=re.IGNORECASE)
              
     return texto

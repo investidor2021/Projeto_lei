@@ -110,6 +110,8 @@ def gerar_lei_final(dados):
     
     p = doc.add_paragraph(f"LEI N.º {dados['numero']}, DE {data_lei_str.upper()}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(0)
+    p.paragraph_format.space_after = Pt(0)
     p.runs[0].bold = True
     p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
@@ -120,6 +122,8 @@ def gerar_lei_final(dados):
     num_proj_display = f"{num_proj_raw}/{ano_lei}" if num_proj_raw else ""
     p = doc.add_paragraph(f"Projeto de Lei n.º {num_proj_display}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(0)
+    p.paragraph_format.space_after = Pt(0)
     p.runs[0].bold = True
     p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
@@ -176,7 +180,7 @@ def gerar_lei_final(dados):
     remover_bordas_tabela(table)
     
     # Definindo larguras
-    widths = [Cm(13.5), Cm(2.5)]
+    widths = [Cm(14.0), Cm(2.5)]
     
     # Preencher itens
     for item in dados['itens_credito']:
@@ -359,7 +363,7 @@ def gerar_lei_final(dados):
     p.runs[0].font.size = Pt(12)
     
     # 3 linhas em branco
-    doc.add_paragraph("\n")
+    doc.add_paragraph()
     
     p = doc.add_paragraph(dados['prefeito'].upper())
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -383,7 +387,7 @@ def gerar_lei_final(dados):
     p.runs[0].font.size = Pt(12)
     
     # 3 linhas em branco
-    doc.add_paragraph("\n")
+    doc.add_paragraph()
     
     # Assinatura da secretária
     p = doc.add_paragraph(dados.get('secretaria', 'RITA DE CÁSSIA CÔRTES FERRAZ').upper())
