@@ -306,7 +306,9 @@ with colcred:
             item = st.selectbox("Escolha a ficha", options=opcoes_planilha, format_func=lambda x: x["label"])
 
         with col2:
-            valor_str = st.text_input("Valor R$", value=st.session_state.get("valor_credito_simples_str", "0,00"), key="valor_credito_simples_str", on_change=lambda: formatar_input("valor_credito_simples_str"))
+            if "valor_credito_simples_str" not in st.session_state:
+                st.session_state["valor_credito_simples_str"] = "0,00"
+            valor_str = st.text_input("Valor R$", key="valor_credito_simples_str", on_change=lambda: formatar_input("valor_credito_simples_str"))
             valor = parse_moeda(valor_str)
 
         with col3:
@@ -341,7 +343,9 @@ with colanul:
             item_a = st.selectbox("Escolha a ficha para anulação", options=opcoes_planilha, format_func=lambda x: x["label"])
         
         with col2:
-            valor_a_str = st.text_input("Valor R$", value=st.session_state.get("valor_anulacao_str", "0,00"), key="valor_anulacao_str", on_change=lambda: formatar_input("valor_anulacao_str"))
+            if "valor_anulacao_str" not in st.session_state:
+                st.session_state["valor_anulacao_str"] = "0,00"
+            valor_a_str = st.text_input("Valor R$", key="valor_anulacao_str", on_change=lambda: formatar_input("valor_anulacao_str"))
             valor_a = parse_moeda(valor_a_str)
 
         with col3:
