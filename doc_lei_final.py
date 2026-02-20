@@ -44,21 +44,37 @@ def remover_bordas_tabela(table):
     tblPr.append(tblBorders)
 
 
-def fixar_largura_tabela(table):
-    """Forca layout fixo na tabela para o Word respeitar as larguras das colunas."""
+def fixar_largura_tabela(table, total_width_cm=16.0):
+    """Força layout fixo e define a largura preferencial da tabela.
+    
+    O 'total_width_cm' deve ser a soma de todas as colunas.
+    Isso equivale a marcar 'largura preferencial' nas propriedades da tabela no Word.
+    """
     tbl = table._tbl
     tblPr = tbl.find(qn('w:tblPr'))
     if tblPr is None:
         tblPr = OxmlElement('w:tblPr')
         tbl.insert(0, tblPr)
-    # Remove layout existente se houver
+
+    # 1. Definir a largura preferencial da tabela (w:tblW)
+    # 1 cm = 566.929 twips (dxa). Total em dxa:
+    total_dxa = int(total_width_cm * 566.929)
+    existing_tblW = tblPr.find(qn('w:tblW'))
+    if existing_tblW is not None:
+        tblPr.remove(existing_tblW)
+    tblW = OxmlElement('w:tblW')
+    tblW.set(qn('w:w'), str(total_dxa))
+    tblW.set(qn('w:type'), 'dxa')
+    tblPr.append(tblW)
+
+    # 2. Forçar layout fixo (w:tblLayout type=fixed)
     existing_layout = tblPr.find(qn('w:tblLayout'))
     if existing_layout is not None:
         tblPr.remove(existing_layout)
-    # Inserir layout fixo
     tblLayout = OxmlElement('w:tblLayout')
     tblLayout.set(qn('w:type'), 'fixed')
     tblPr.append(tblLayout)
+
 
 
 def classify_expense_type(itens_credito):
@@ -140,7 +156,7 @@ def gerar_lei_final(dados):
     p = doc.add_paragraph(f"Projeto de Lei n.º {num_proj_display}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_before = Pt(0)
-    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.space_after = Pt(12)
     p.runs[0].bold = True
     p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
