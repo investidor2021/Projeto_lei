@@ -20,8 +20,30 @@ def add_coat_of_arms(doc):
     run = p_brasao.add_run()
     run.add_picture(brasao_path, width=Cm(4.5))  # Ajustar tamanho conforme necessário
     
-     
-    
+
+
+def remover_bordas_tabela(table):
+    """Remove todas as bordas de uma tabela DOCX via XML."""
+    tbl = table._tbl
+    tblPr = tbl.find(qn('w:tblPr'))
+    if tblPr is None:
+        tblPr = OxmlElement('w:tblPr')
+        tbl.insert(0, tblPr)
+    tblBorders = OxmlElement('w:tblBorders')
+    for border_name in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
+        border = OxmlElement(f'w:{border_name}')
+        border.set(qn('w:val'), 'none')
+        border.set(qn('w:sz'), '0')
+        border.set(qn('w:space'), '0')
+        border.set(qn('w:color'), 'auto')
+        tblBorders.append(border)
+    # Remove existing borders if any, then add clean one
+    existing = tblPr.find(qn('w:tblBorders'))
+    if existing is not None:
+        tblPr.remove(existing)
+    tblPr.append(tblBorders)
+
+
 def classify_expense_type(itens_credito):
     """
     Classifica as despesas em 'de capital', 'de custeio' ou ambas.
@@ -77,7 +99,16 @@ def gerar_lei_final(dados):
     # ---------------------------------------------------------
     # TÍTULO - LEI N.º
     # ---------------------------------------------------------
-    p = doc.add_paragraph(f"LEI N.º {dados['numero']}")
+    # Montar data da lei a partir da data do usuário
+    meses_lei = {
+        1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
+        5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
+        9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
+    }
+    data_lei = dados.get('data_documento', date.today())
+    data_lei_str = f"{data_lei.day} de {meses_lei[data_lei.month]} de {data_lei.year}"
+    
+    p = doc.add_paragraph(f"LEI N.º {dados['numero']}, DE {data_lei_str.upper()}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.runs[0].bold = True
     p.runs[0].font.size = Pt(14)
@@ -86,7 +117,7 @@ def gerar_lei_final(dados):
     # Número do Projeto de Lei
     p = doc.add_paragraph(f"Projeto de Lei n.º {dados.get('numero_projeto', '')}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.runs[0].bold = False
+    p.runs[0].bold = True
     p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
     
@@ -94,7 +125,7 @@ def gerar_lei_final(dados):
     
     # Ementa com recuo de 9cm
     p = doc.add_paragraph(f"Dispõe sobre a abertura de Crédito Adicional {dados['tipo_lei']}")
-    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.paragraph_format.left_indent = Cm(9.0)
     p.runs[0].bold = False
     p.runs[0].font.size = Pt(12)
@@ -139,6 +170,7 @@ def gerar_lei_final(dados):
     # Criar tabela com 2 colunas
     table = doc.add_table(rows=0, cols=2)
     table.style = "Table Grid"
+    remover_bordas_tabela(table)
     
     # Definindo larguras
     widths = [Cm(13.5), Cm(2.5)]
@@ -240,6 +272,7 @@ def gerar_lei_final(dados):
         # Tabela de anulação
         table_a = doc.add_table(rows=0, cols=2)
         table_a.style = 'Table Grid'
+        remover_bordas_tabela(table_a)
         
         for item in dados['itens_anulacao']:
             row = table_a.add_row()
@@ -306,7 +339,7 @@ def gerar_lei_final(dados):
     data_extenso = f"Prefeitura Municipal de {dados['municipio']}, {hoje.day} de {meses[hoje.month]} de {hoje.year}."
     
     p = doc.add_paragraph(data_extenso)
-    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
@@ -314,7 +347,7 @@ def gerar_lei_final(dados):
     doc.add_paragraph("\n\n")
     
     p = doc.add_paragraph(dados['prefeito'].upper())
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
     p.runs[0].bold = True
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
@@ -339,7 +372,7 @@ def gerar_lei_final(dados):
     
     # Assinatura da secretária
     p = doc.add_paragraph(dados.get('secretaria', 'RITA DE CÁSSIA CÔRTES FERRAZ').upper())
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
     p.runs[0].bold = True
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
