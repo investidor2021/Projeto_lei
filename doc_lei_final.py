@@ -181,7 +181,7 @@ def gerar_lei_final(dados):
     p = doc.add_paragraph(f"Dispõe sobre a abertura de Crédito Adicional {dados['tipo_lei']}")
     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p.paragraph_format.space_before = Pt(12)
-    p.paragraph_format.space_after = Pt(0)
+    p.paragraph_format.space_after = Pt(12)
     p.paragraph_format.left_indent = Cm(9.0)
     p.runs[0].bold = False
     p.runs[0].font.size = Pt(12)
@@ -381,7 +381,12 @@ def gerar_lei_final(dados):
                     r.bold = True
                     r.font.name = 'Times New Roman'
                     r.font.size = Pt(8)
-                
+
+        # Espaço entre tabela de anulação e artigos
+        p_esp = doc.add_paragraph()
+        p_esp.paragraph_format.space_before = Pt(0)
+        p_esp.paragraph_format.space_after = Pt(0)    
+
         art_num += 1
 
     # ---------------------------------------------------------
