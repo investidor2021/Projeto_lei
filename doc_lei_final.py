@@ -44,11 +44,11 @@ def remover_bordas_tabela(table):
     tblPr.append(tblBorders)
 
 
-def fixar_largura_tabela(table, total_width_cm=16.0):
-    """Força layout fixo e define a largura preferencial da tabela.
+def fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=None):
+    """Força layout fixo, largura preferencial e grid de colunas na tabela.
     
-    O 'total_width_cm' deve ser a soma de todas as colunas.
-    Isso equivale a marcar 'largura preferencial' nas propriedades da tabela no Word.
+    - total_width_cm: soma de todas as colunas
+    - column_widths_cm: lista com a largura de cada coluna em cm
     """
     tbl = table._tbl
     tblPr = tbl.find(qn('w:tblPr'))
@@ -56,24 +56,38 @@ def fixar_largura_tabela(table, total_width_cm=16.0):
         tblPr = OxmlElement('w:tblPr')
         tbl.insert(0, tblPr)
 
-    # 1. Definir a largura preferencial da tabela (w:tblW)
-    # 1 cm = 566.929 twips (dxa). Total em dxa:
+    # 1. Largura preferencial da tabela (w:tblW) — "Large preferencial" no Word
     total_dxa = int(total_width_cm * 566.929)
-    existing_tblW = tblPr.find(qn('w:tblW'))
-    if existing_tblW is not None:
-        tblPr.remove(existing_tblW)
+    for existing in tblPr.findall(qn('w:tblW')):
+        tblPr.remove(existing)
     tblW = OxmlElement('w:tblW')
     tblW.set(qn('w:w'), str(total_dxa))
     tblW.set(qn('w:type'), 'dxa')
     tblPr.append(tblW)
 
-    # 2. Forçar layout fixo (w:tblLayout type=fixed)
-    existing_layout = tblPr.find(qn('w:tblLayout'))
-    if existing_layout is not None:
-        tblPr.remove(existing_layout)
+    # 2. Layout fixo (w:tblLayout)
+    for existing in tblPr.findall(qn('w:tblLayout')):
+        tblPr.remove(existing)
     tblLayout = OxmlElement('w:tblLayout')
     tblLayout.set(qn('w:type'), 'fixed')
     tblPr.append(tblLayout)
+
+    # 3. Definir o grid de colunas (w:tblGrid / w:gridCol)
+    # Este é o elemento que o Word usa como template de larguras no layout fixo
+    if column_widths_cm:
+        existing_grid = tbl.find(qn('w:tblGrid'))
+        if existing_grid is not None:
+            tbl.remove(existing_grid)
+        tblGrid = OxmlElement('w:tblGrid')
+        for col_cm in column_widths_cm:
+            col_dxa = int(col_cm * 566.929)
+            gridCol = OxmlElement('w:gridCol')
+            gridCol.set(qn('w:w'), str(col_dxa))
+            tblGrid.append(gridCol)
+        # Inserir tblGrid DOPO tblPr (é filho direto de w:tbl)
+        tblPr_idx = list(tbl).index(tblPr)
+        tbl.insert(tblPr_idx + 1, tblGrid)
+
 
 
 
@@ -213,10 +227,10 @@ def gerar_lei_final(dados):
     table = doc.add_table(rows=0, cols=2)
     table.style = "Table Grid"
     remover_bordas_tabela(table)
-    fixar_largura_tabela(table)
     
     # Larguras: total = 13.5 + 2.5 = 16.0 cm (= area util com margens 3.0 + 2.0)
     widths = [Cm(13.5), Cm(2.5)]
+    fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
     
     # Preencher itens
     for item in dados['itens_credito']:
@@ -261,13 +275,16 @@ def gerar_lei_final(dados):
                 r.font.name = 'Times New Roman'
                 r.font.size = Pt(8)
 
+    # Espaço entre tabela de crédito e artigos
+    p_esp = doc.add_paragraph()
+    p_esp.paragraph_format.space_before = Pt(0)
+    p_esp.paragraph_format.space_after = Pt(0)
+
     # ---------------------------------------------------------
     # ARTIGO 2º - FONTES (EXCESSO OU SUPERÁVIT)
     # ---------------------------------------------------------
     art_num = 2
 
-    p.paragraph_format.space_before = Pt(12)
-    p.paragraph_format.space_after = Pt(0)
     
     if dados['val_exc'] > 0:
         # Texto base
@@ -328,7 +345,7 @@ def gerar_lei_final(dados):
         table_a = doc.add_table(rows=0, cols=2)
         table_a.style = 'Table Grid'
         remover_bordas_tabela(table_a)
-        fixar_largura_tabela(table_a)
+        fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
         
         for item in dados['itens_anulacao']:
             row = table_a.add_row()
