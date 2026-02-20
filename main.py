@@ -142,8 +142,22 @@ with st.expander("📄 1. Identificação", expanded=True):
     tipo_doc = c1.radio("Tipo do Documento", ["Projeto de Lei", "Lei Finalizada", "Decreto"], horizontal=True)
     tipo_lei = c1.radio("Tipo de Crédito", ["Suplementar", "Especial"], horizontal=True)
 
-    numero = c2.text_input("Número da Lei", placeholder="Ex: 5.182/2026")
-    numero_projeto = c2.text_input("Número do Projeto", placeholder="Ex: 26/2026")
+    # Pre-inicializa para evitar conflito de session state
+    if "numero_lei_str" not in st.session_state:
+        st.session_state["numero_lei_str"] = ""
+    if "numero_projeto_str" not in st.session_state:
+        st.session_state["numero_projeto_str"] = ""
+
+    def formatar_numero_lei():
+        raw = st.session_state.get("numero_lei_str", "").replace(".", "").strip()
+        if raw.isdigit():
+            st.session_state["numero_lei_str"] = f"{int(raw):,}".replace(",", ".")
+
+    numero = c2.text_input("Número da Lei", key="numero_lei_str",
+                           placeholder="Ex: 5182",
+                           on_change=formatar_numero_lei)
+    numero_projeto = c2.text_input("Número do Projeto", key="numero_projeto_str",
+                                  placeholder="Ex: 42 (ano será adicionado automaticamente)")
     municipio = c3.text_input("Município", "Vargem Grande do Sul")
     prefeito = c5.text_input("Prefeito", "CELSO LUIS RIBEIRO")
     

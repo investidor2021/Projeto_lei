@@ -18,7 +18,7 @@ def add_coat_of_arms(doc):
     p_brasao = doc.add_paragraph()
     p_brasao.alignment = WD_ALIGN_PARAGRAPH.CENTER
     run = p_brasao.add_run()
-    run.add_picture(brasao_path, width=Cm(4.5))  # Ajustar tamanho conforme necessário
+    run.add_picture(brasao_path, width=Cm(4.0), height=Cm(3.82))  # Ajustar tamanho conforme necessário
     
 
 
@@ -111,17 +111,20 @@ def gerar_lei_final(dados):
     p = doc.add_paragraph(f"LEI N.º {dados['numero']}, DE {data_lei_str.upper()}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.runs[0].bold = True
-    p.runs[0].font.size = Pt(14)
+    p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
     
-    # Número do Projeto de Lei
-    p = doc.add_paragraph(f"Projeto de Lei n.º {dados.get('numero_projeto', '')}")
+    # Número do Projeto de Lei — exibe numero/ano automaticamente
+    num_proj_raw = str(dados.get('numero_projeto', '')).strip()
+    ano_lei = data_lei.year
+    num_proj_display = f"{num_proj_raw}/{ano_lei}" if num_proj_raw else ""
+    p = doc.add_paragraph(f"Projeto de Lei n.º {num_proj_display}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.runs[0].bold = True
     p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
     
-    doc.add_paragraph()  # Espaço
+    #doc.add_paragraph()  # Espaço
     
     # Ementa com recuo de 9cm
     p = doc.add_paragraph(f"Dispõe sobre a abertura de Crédito Adicional {dados['tipo_lei']}")
