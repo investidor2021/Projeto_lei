@@ -899,9 +899,9 @@ if st.button("Gerar DOCX"):
         else:
             buffer = gerar_decreto(dados)
 
-        st.download_button(
-            label="⬇️ Baixar Documento",
+        #st.download_button(
+            #label="⬇️ Baixar Documento",
             data=buffer,
             file_name=f"{tipo_doc}_{numero}.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
+        #)
