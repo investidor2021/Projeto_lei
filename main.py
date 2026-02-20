@@ -235,27 +235,33 @@ def processar_dataframe(df):
             aplicacao = str(row.iloc[14]).strip()
             
             # Tentar extrair o código do departamento de qualquer campo relevante
-            # O usuário informou que o código é tipo "01.02.20"
+            # O código fica nos primeiros 8 chars de 'descricao' (ex: "01.02.01")
             cod_depto = None
-            # Procura em descrição ou ficha (às vezes a ficha tem a info?) 
-            # Ou talvez esteja na coluna 0 (descricao)?
             import re
             
-            # Lista de campos para procurar o código do departamento
-            campos_busca = [descricao, ficha] 
-            for campo in campos_busca:
-                match = re.search(r'\b(\d{2}\.\d{2}\.\d{2})\b', campo)
-                if match:
-                    cod_depto = match.group(1)
-                    break
+            # Procura padrão XX.XX.XX na descrição (geralmente o início)
+            match_cod = re.search(r'\b(\d{2}\.\d{2}\.\d{2})\b', descricao)
+            if match_cod:
+                cod_depto = match_cod.group(1)
             
-            depto_abreviado = abreviar_texto(depto, cod_depto=cod_depto)
+            # Abreviação do departamento: prioriza busca pelo código
+            from audesp_codes import DEPARTAMENTOS
+            if cod_depto and cod_depto in DEPARTAMENTOS:
+                depto_abreviado = DEPARTAMENTOS[cod_depto]
+            else:
+                depto_abreviado = abreviar_texto(depto)
             
-            label = f"Ficha: {ficha} - {descricao} {numdespesa}.0{fonte}.{aplicacao} - {abreviar_texto(nomedespesa)} - {depto_abreviado}"
+            nomedespesa_abreviado = abreviar_texto(nomedespesa)
+            
+            # Label para UI (com "Ficha:" para facilitar a leitura no menu)
+            label = f"Ficha: {ficha} - {descricao} {numdespesa}.0{fonte}.{aplicacao} - {nomedespesa_abreviado} - {depto_abreviado}"
+            
+            # Label para o DOCX: sem a palavra "Ficha:", só o número e o restante
+            label_docx = f"{ficha} - {descricao} {numdespesa}.0{fonte}.{aplicacao} - {nomedespesa_abreviado} - {depto_abreviado}"
         
             options.append({
                 "label": label,
-                "label_docx": label,
+                "label_docx": label_docx,
                 "id": f"{ficha}-{idx}",
                 "ficha": ficha,
                 "valor": 0.0,
