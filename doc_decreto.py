@@ -159,7 +159,7 @@ def gerar_decreto(dados):
 
     if tem_ficha:
         widths = [Cm(1.0), Cm(11.5), Cm(2.5)]
-        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[2.0, 11.5, 2.5])
+        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[1.0, 11.5, 2.5])
     else:
         widths = [Cm(13.5), Cm(2.5)]
         fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
@@ -246,7 +246,7 @@ def gerar_decreto(dados):
         remover_bordas_tabela(table_a)
         if tem_ficha_a:
             widths_a = [Cm(1), Cm(11.5), Cm(2.5)]
-            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[2.0, 11.5, 2.5])
+            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[1.0, 11.5, 2.5])
         else:
             widths_a = [Cm(13.5), Cm(2.5)]
             fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
