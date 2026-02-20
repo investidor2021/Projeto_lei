@@ -425,7 +425,7 @@ if tipo_lei == "Especial":
     # ===== COMPONENTES PRINCIPAIS (sempre visíveis) =====
     st.markdown("### 📋 Itens da nova dotação")
 
-    col1, col2, col3, col4   = st.columns([1,0.75,0.5,0.75])
+    col1, col2, col3, col4   = st.columns([1,0.75,1,0.75])
 
     with col1:
     # Departamento
