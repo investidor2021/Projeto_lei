@@ -156,12 +156,12 @@ def gerar_lei_final(dados):
     p = doc.add_paragraph(f"Projeto de Lei n.º {num_proj_display}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_before = Pt(0)
-    p.paragraph_format.space_after = Pt(12)
+    p.paragraph_format.space_after = Pt(0)
     p.runs[0].bold = True
     p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
     
-    #doc.add_paragraph()  # Espaço
+    doc.add_paragraph()  # Espaço
     
     # Ementa com recuo de 9cm
     p = doc.add_paragraph(f"Dispõe sobre a abertura de Crédito Adicional {dados['tipo_lei']}")
@@ -285,7 +285,8 @@ def gerar_lei_final(dados):
         p.runs[0].font.name = 'Times New Roman'
         p.runs[0].font.size = Pt(12)
         art_num += 1
-        
+
+    doc.add_paragraph()  # Espaço    
     if dados['val_sup'] > 0:
         conector = ", ainda," if dados['val_exc'] > 0 else ""
         texto_sup = (
@@ -302,6 +303,8 @@ def gerar_lei_final(dados):
         p.runs[0].font.size = Pt(12)
         art_num += 1
 
+    doc.add_paragraph()  # Espaço
+    
     # Se houver ANULAÇÃO
     if dados['itens_anulacao']:
         conector = ", ainda," if (dados['val_exc'] > 0 or dados['val_sup'] > 0) else ""
