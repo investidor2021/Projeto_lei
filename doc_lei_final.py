@@ -208,12 +208,18 @@ def gerar_lei_final(dados):
         for idx, width in enumerate(widths):
             row.cells[idx].width = width
     
-    # Total
-    p = doc.add_paragraph(f"Total {format_currency(dados['total_credito'])}")
-    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    p.runs[0].bold = True
-    p.runs[0].font.name = 'Times New Roman'
-    p.runs[0].font.size = Pt(8)
+    # Total — linha dentro da tabela para alinhar com a coluna de valores
+    row_total = table.add_row()
+    row_total.cells[0].paragraphs[0].text = "Total"
+    row_total.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    row_total.cells[1].paragraphs[0].text = format_currency(dados['total_credito'])
+    row_total.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    for c in row_total.cells:
+        for p in c.paragraphs:
+            for r in p.runs:
+                r.bold = True
+                r.font.name = 'Times New Roman'
+                r.font.size = Pt(8)
 
     # ---------------------------------------------------------
     # ARTIGO 2º - FONTES (EXCESSO OU SUPERÁVIT)
@@ -299,12 +305,18 @@ def gerar_lei_final(dados):
             for idx, width in enumerate(widths):
                 row.cells[idx].width = width
         
-        # Total da anulação
-        p = doc.add_paragraph(f"Total {format_currency(total_anul)}")
-        p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        p.runs[0].bold = True
-        p.runs[0].font.name = 'Times New Roman'
-        p.runs[0].font.size = Pt(8)        
+        # Total da anulação — linha dentro da tabela para alinhar com a coluna de valores
+        row_total_a = table_a.add_row()
+        row_total_a.cells[0].paragraphs[0].text = "Total"
+        row_total_a.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        row_total_a.cells[1].paragraphs[0].text = format_currency(total_anul)
+        row_total_a.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        for c in row_total_a.cells:
+            for p in c.paragraphs:
+                for r in p.runs:
+                    r.bold = True
+                    r.font.name = 'Times New Roman'
+                    r.font.size = Pt(8)
                 
         art_num += 1
 
@@ -347,7 +359,7 @@ def gerar_lei_final(dados):
     p.runs[0].font.size = Pt(12)
     
     # 3 linhas em branco
-    doc.add_paragraph("\n\n")
+    doc.add_paragraph("\n")
     
     p = doc.add_paragraph(dados['prefeito'].upper())
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -358,7 +370,7 @@ def gerar_lei_final(dados):
     # ---------------------------------------------------------
     # REGISTRO E PUBLICAÇÃO + ASSINATURA DA SECRETÁRIA
     # ---------------------------------------------------------
-    doc.add_paragraph("\n")
+    #doc.add_paragraph("\n")
     
     # Texto de registro
     texto_registro = (
@@ -371,7 +383,7 @@ def gerar_lei_final(dados):
     p.runs[0].font.size = Pt(12)
     
     # 3 linhas em branco
-    doc.add_paragraph("\n\n")
+    doc.add_paragraph("\n")
     
     # Assinatura da secretária
     p = doc.add_paragraph(dados.get('secretaria', 'RITA DE CÁSSIA CÔRTES FERRAZ').upper())
