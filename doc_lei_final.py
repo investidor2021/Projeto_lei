@@ -266,7 +266,9 @@ def gerar_lei_final(dados):
     # ---------------------------------------------------------
     art_num = 2
 
-   
+    p.paragraph_format.space_before = Pt(12)
+    p.paragraph_format.space_after = Pt(0)
+    
     if dados['val_exc'] > 0:
         # Texto base
         texto_exc = (
