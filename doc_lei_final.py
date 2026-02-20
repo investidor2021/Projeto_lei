@@ -123,7 +123,7 @@ def gerar_lei_final(dados):
     p = doc.add_paragraph(f"Projeto de Lei n.º {num_proj_display}")
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_before = Pt(0)
-    p.paragraph_format.space_after = Pt(0)
+    p.paragraph_format.space_after = Pt(6)
     p.runs[0].bold = True
     p.runs[0].font.size = Pt(12)
     p.runs[0].font.name = 'Times New Roman'
@@ -180,7 +180,7 @@ def gerar_lei_final(dados):
     remover_bordas_tabela(table)
     
     # Definindo larguras
-    widths = [Cm(14.0), Cm(2.5)]
+    widths = [Cm(13.94), Cm(2.5)]
     
     # Preencher itens
     for item in dados['itens_credito']:
