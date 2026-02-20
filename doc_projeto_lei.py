@@ -24,8 +24,59 @@ def add_coat_of_arms(doc):
     run = p_brasao.add_run()
     run.add_picture(brasao_path, width=Cm(4.5))  # Ajustar tamanho conforme necessário
     
-     
-    
+
+def remover_bordas_tabela(table):
+    """Remove todas as bordas de uma tabela DOCX via XML."""
+    tbl = table._tbl
+    tblPr = tbl.find(qn('w:tblPr'))
+    if tblPr is None:
+        tblPr = OxmlElement('w:tblPr')
+        tbl.insert(0, tblPr)
+    tblBorders = OxmlElement('w:tblBorders')
+    for border_name in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
+        border = OxmlElement(f'w:{border_name}')
+        border.set(qn('w:val'), 'none')
+        border.set(qn('w:sz'), '0')
+        border.set(qn('w:space'), '0')
+        border.set(qn('w:color'), 'auto')
+        tblBorders.append(border)
+    existing = tblPr.find(qn('w:tblBorders'))
+    if existing is not None:
+        tblPr.remove(existing)
+    tblPr.append(tblBorders)
+
+
+def fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=None):
+    """Força layout fixo, largura preferencial e grid de colunas."""
+    tbl = table._tbl
+    tblPr = tbl.find(qn('w:tblPr'))
+    if tblPr is None:
+        tblPr = OxmlElement('w:tblPr')
+        tbl.insert(0, tblPr)
+    total_dxa = int(total_width_cm * 566.929)
+    for existing in tblPr.findall(qn('w:tblW')):
+        tblPr.remove(existing)
+    tblW = OxmlElement('w:tblW')
+    tblW.set(qn('w:w'), str(total_dxa))
+    tblW.set(qn('w:type'), 'dxa')
+    tblPr.append(tblW)
+    for existing in tblPr.findall(qn('w:tblLayout')):
+        tblPr.remove(existing)
+    tblLayout = OxmlElement('w:tblLayout')
+    tblLayout.set(qn('w:type'), 'fixed')
+    tblPr.append(tblLayout)
+    if column_widths_cm:
+        existing_grid = tbl.find(qn('w:tblGrid'))
+        if existing_grid is not None:
+            tbl.remove(existing_grid)
+        tblGrid = OxmlElement('w:tblGrid')
+        for col_cm in column_widths_cm:
+            gridCol = OxmlElement('w:gridCol')
+            gridCol.set(qn('w:w'), str(int(col_cm * 566.929)))
+            tblGrid.append(gridCol)
+        tbl.insert(list(tbl).index(tblPr) + 1, tblGrid)
+
+
 def classify_expense_type(itens_credito):
     """
     Classifica as despesas em 'de capital', 'de custeio' ou ambas.
@@ -87,7 +138,7 @@ def gerar_projeto_lei(dados):
     p.runs[0].font.size = Pt(14)
     p.runs[0].font.name = 'Times New Roman'
     
-    doc.add_paragraph()  # Espaço
+    #doc.add_paragraph()  # Espaço
     
     # Ementa com recuo de 9cm
     p = doc.add_paragraph(f"Dispõe sobre a abertura de Crédito Adicional {dados['tipo_lei']}")
@@ -143,9 +194,11 @@ def gerar_projeto_lei(dados):
     # Criar tabela com 2 colunas
     table = doc.add_table(rows=0, cols=2)
     table.style = "Table Grid"
+    remover_bordas_tabela(table)
     
-    # Definindo larguras
+    # Larguras: total = 16.0 cm (area util A4 com margens 3.0 + 2.0)
     widths = [Cm(13.5), Cm(2.5)]
+    fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
     
     # Preencher itens
     for item in dados['itens_credito']:
@@ -178,16 +231,23 @@ def gerar_projeto_lei(dados):
         for idx, width in enumerate(widths):
             row.cells[idx].width = width
         
-    #doc.add_paragraph()
-    
-    # Total
-    p = doc.add_paragraph(f"Total {format_currency(dados['total_credito'])}")
-    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    p.runs[0].bold = True
-    p.runs[0].font.name = 'Times New Roman'
-    p.runs[0].font.size = Pt(12)
-    
-    #doc.add_paragraph()
+    # Total — última linha da tabela
+    row_total = table.add_row()
+    row_total.cells[0].paragraphs[0].text = "Total"
+    row_total.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    row_total.cells[1].paragraphs[0].text = format_currency(dados['total_credito'])
+    row_total.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    for c in row_total.cells:
+        for p in c.paragraphs:
+            for r in p.runs:
+                r.bold = True
+                r.font.name = 'Times New Roman'
+                r.font.size = Pt(8)
+
+    # Espaço após tabela de crédito
+    p_esp = doc.add_paragraph()
+    p_esp.paragraph_format.space_before = Pt(0)
+    p_esp.paragraph_format.space_after = Pt(0)
 
     # ---------------------------------------------------------
     # ARTIGO 2º - FONTES (EXCESSO OU SUPERÁVIT)
@@ -250,6 +310,8 @@ def gerar_projeto_lei(dados):
         # Tabela de anulação
         table_a = doc.add_table(rows=0, cols=2)
         table_a.style = 'Table Grid'
+        remover_bordas_tabela(table_a)
+        fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
         
         for item in dados['itens_anulacao']:
             row = table_a.add_row()
@@ -273,14 +335,23 @@ def gerar_projeto_lei(dados):
             for idx, width in enumerate(widths):
                 row.cells[idx].width = width
         
-        # Total da anulação
-        p = doc.add_paragraph(f"Total {format_currency(total_anul)}")
-        p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        p.runs[0].bold = True
-        p.runs[0].font.name = 'Times New Roman'
-        p.runs[0].font.size = Pt(12)        
-                
-        #doc.add_paragraph()
+        # Total da anulação — última linha da tabela
+        row_total_a = table_a.add_row()
+        row_total_a.cells[0].paragraphs[0].text = "Total"
+        row_total_a.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        row_total_a.cells[1].paragraphs[0].text = format_currency(total_anul)
+        row_total_a.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        for c in row_total_a.cells:
+            for p in c.paragraphs:
+                for r in p.runs:
+                    r.bold = True
+                    r.font.name = 'Times New Roman'
+                    r.font.size = Pt(8)
+
+        # Espaço após tabela de anulação
+        p_esp = doc.add_paragraph()
+        p_esp.paragraph_format.space_before = Pt(0)
+        p_esp.paragraph_format.space_after = Pt(0)
         art_num += 1
 
     # ---------------------------------------------------------
