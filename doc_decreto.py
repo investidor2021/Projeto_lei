@@ -150,7 +150,7 @@ def gerar_decreto(dados):
     # TABELA DE DOTAÇÕES
     # ---------------------------------------------------------
     # Detectar se os itens vêm da planilha (têm 'ficha')
-    tem_ficha = any(str(item.get('ficha', '')).strip() for item in dados['itens_credito'])
+    tem_ficha = any(str(item.get('ficha', '')).strip().isdigit() for item in dados['itens_credito'])
     num_cols = 3 if tem_ficha else 2
 
     table = doc.add_table(rows=0, cols=num_cols)
@@ -239,7 +239,7 @@ def gerar_decreto(dados):
         p.runs[0].font.size = Pt(12)
         
         # Tabela de anulação
-        tem_ficha_a = any(str(i.get('ficha', '')).strip() for i in dados['itens_anulacao'])
+        tem_ficha_a = any(str(i.get('ficha', '')).strip().isdigit() for i in dados['itens_anulacao'])
         num_cols_a = 3 if tem_ficha_a else 2
         table_a = doc.add_table(rows=0, cols=num_cols_a)
         table_a.style = 'Table Grid'
