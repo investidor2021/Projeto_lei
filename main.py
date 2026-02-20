@@ -439,24 +439,24 @@ if tipo_lei == "Especial":
        
 
     with col2:
-    # Subfunção
-        opcoes_subfuncao = audesp_codes.obter_opcoes_subfuncao()
-        subfuncao_selecionada = st.selectbox(
-            "Subfunção",
-            options=[cod for cod, _ in opcoes_subfuncao],
-            format_func=lambda x: next(label for cod, label in opcoes_subfuncao if cod == x),
-            key="subfuncao_completo"
-        )
-
-        
-    with col3:
-    # Função
+        # Função
         opcoes_funcao = audesp_codes.obter_opcoes_funcao()
         funcao_selecionada = st.selectbox(
             "Função",
             options=[cod for cod, _ in opcoes_funcao],
             format_func=lambda x: next(label for cod, label in opcoes_funcao if cod == x),
             key="funcao_completo"
+        )
+
+        
+    with col3:
+        # Subfunção
+        opcoes_subfuncao = audesp_codes.obter_opcoes_subfuncao()
+        subfuncao_selecionada = st.selectbox(
+            "Subfunção",
+            options=[cod for cod, _ in opcoes_subfuncao],
+            format_func=lambda x: next(label for cod, label in opcoes_subfuncao if cod == x),
+            key="subfuncao_completo"
         )
 
     with col4:
@@ -698,11 +698,16 @@ if tipo_lei == "Especial":
         # Buscar nome do elemento
         elemento_nome = audesp_codes.ELEMENTOS_DESPESA_DETALHADOS.get(elemento_selecionado, "")
 
-    # Buscar nome do departamento
+    # Buscar nome do departamento (completo para UI, abreviado para DOCX)
     depto_nome = audesp_codes.DEPARTAMENTOS.get(depto_selecionado, "")
+    depto_nome_abrev = abreviar_texto(depto_nome, cod_depto=depto_selecionado)
+    elemento_nome_abrev = abreviar_texto(elemento_nome)
 
-    # Montar descrição no formato DOCX
+    # Label para UI (nome completo)
     descricao_docx = f"{dotacao_completa} - {elemento_nome} - {depto_nome}"
+    
+    # Label para DOCX (nomes abreviados)
+    descricao_label_docx = f"{dotacao_completa} - {elemento_nome_abrev} - {depto_nome_abrev}"
 
     # Exibir o código completo e descrição
     st.markdown("---")
@@ -747,7 +752,7 @@ if tipo_lei == "Especial":
     if adicionar:
         item_manual = {
             "label": descricao_docx,
-            "label_docx": descricao_docx,
+            "label_docx": descricao_label_docx,
             "id": f"manual-{uuid.uuid4()}",
             "ficha": dotacao_completa,
             "valor": valor

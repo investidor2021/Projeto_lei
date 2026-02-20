@@ -213,7 +213,7 @@ def gerar_lei_final(dados):
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p.runs[0].bold = True
     p.runs[0].font.name = 'Times New Roman'
-    p.runs[0].font.size = Pt(12)
+    p.runs[0].font.size = Pt(8)
 
     # ---------------------------------------------------------
     # ARTIGO 2º - FONTES (EXCESSO OU SUPERÁVIT)
@@ -304,7 +304,7 @@ def gerar_lei_final(dados):
         p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
         p.runs[0].bold = True
         p.runs[0].font.name = 'Times New Roman'
-        p.runs[0].font.size = Pt(12)        
+        p.runs[0].font.size = Pt(8)        
                 
         art_num += 1
 
