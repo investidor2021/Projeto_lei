@@ -224,7 +224,7 @@ def gerar_lei_final(dados):
     # TABELA DE DOTAÇÕES
     # ---------------------------------------------------------
     # Detectar se os itens vêm da planilha (têm 'ficha')
-    tem_ficha = any(str(item.get('ficha', '')).strip().isdigit() for item in dados['itens_credito'])
+    tem_ficha = any(str(item.get('ficha')).strip().isdigit() for item in dados['itens_credito'])
     num_cols = 3 if tem_ficha else 2
 
     table = doc.add_table(rows=0, cols=num_cols)
