@@ -114,6 +114,8 @@ def processar_planilha(file):
         numdespesa = str(row.iloc[3]).strip()
         fonte = str(row.iloc[6]).strip()
         aplicacao = str(row.iloc[10]).strip()
+        if aplicacao.endswith('.0'): aplicacao = aplicacao[:-2]
+        aplicacao = aplicacao.replace(".", "")
         
         label = f"Ficha: {ficha} - {descricao} {numdespesa}.0{fonte}.{aplicacao} - {abreviar_texto(nomedespesa)} - {abreviar_texto(depto)}"
     
@@ -247,6 +249,8 @@ def processar_dataframe(df):
             numdespesa = str(row.iloc[3]).strip()
             fonte = str(row.iloc[6]).strip()
             aplicacao = str(row.iloc[14]).strip()
+            if aplicacao.endswith('.0'): aplicacao = aplicacao[:-2]
+            aplicacao = aplicacao.replace(".", "")
             
             # Tentar extrair o código do departamento de qualquer campo relevante
             # O código fica nos primeiros 8 chars de 'descricao' (ex: "01.02.01")

@@ -451,7 +451,7 @@ def gerar_projeto_lei(dados):
     if dados.get("justificativa"):
         doc.add_page_break()
         p = doc.add_paragraph("JUSTIFICATIVA")
-        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.runs[0].bold = True
         p.runs[0].font.name = 'Times New Roman'
         p.runs[0].font.size = Pt(14)
@@ -460,6 +460,6 @@ def gerar_projeto_lei(dados):
         p = doc.add_paragraph(dados["justificativa"])
         p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.runs[0].font.name = 'Times New Roman'
-        p.runs[0].font.size = Pt(12)
+        p.runs[0].font.size = Pt(14)
 
     return salvar_docx(doc)
