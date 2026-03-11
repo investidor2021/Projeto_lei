@@ -161,11 +161,11 @@ def gerar_decreto(dados):
     remover_bordas_tabela(table)
 
     if tem_ficha:
-        widths = [Cm(0.75), Cm(12.75), Cm(2.5)]
-        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[0.75, 12.75, 2.5])
+        widths = [Cm(1), Cm(13), Cm(2.5)]
+        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[1, 13, 2.5])
     else:
-        widths = [Cm(13.5), Cm(2.5)]
-        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
+        widths = [Cm(13), Cm(2.5)]
+        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13, 2.5])
 
     # Preencher itens
     for item in dados['itens_credito']:
@@ -248,11 +248,11 @@ def gerar_decreto(dados):
         table_a.style = 'Table Grid'
         remover_bordas_tabela(table_a)
         if tem_ficha_a:
-            widths_a = [Cm(0.75), Cm(12.75), Cm(2.5)]
-            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[0.75, 12.75, 2.5])
+            widths_a = [Cm(1), Cm(13), Cm(2.5)]
+            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[1, 13, 2.5])
         else:
-            widths_a = [Cm(13.5), Cm(2.5)]
-            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
+            widths_a = [Cm(13), Cm(2.5)]
+            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[13, 2.5])
 
         for item in dados['itens_anulacao']:
             row = table_a.add_row()

@@ -202,11 +202,11 @@ def gerar_projeto_lei(dados):
     remover_bordas_tabela(table)
 
     if tem_ficha:
-        widths = [Cm(0.75), Cm(12.75), Cm(2.5)]
-        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[0.75, 12.75, 2.5])
+        widths = [Cm(1), Cm(13), Cm(2.5)]
+        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[1, 13, 2.5])
     else:
-        widths = [Cm(13.5), Cm(2.5)]
-        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
+        widths = [Cm(13), Cm(2.5)]
+        fixar_largura_tabela(table, total_width_cm=16.0, column_widths_cm=[13, 2.5])
 
     # Preencher itens
     for item in dados['itens_credito']:
@@ -332,11 +332,11 @@ def gerar_projeto_lei(dados):
         table_a.style = 'Table Grid'
         remover_bordas_tabela(table_a)
         if tem_ficha_a:
-            widths_a = [Cm(0.75), Cm(12.75), Cm(2.5)]
-            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[0.75, 12.75, 2.5])
+            widths_a = [Cm(1), Cm(13), Cm(2.5)]
+            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[1, 13, 2.5])
         else:
-            widths_a = [Cm(13.5), Cm(2.5)]
-            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[13.5, 2.5])
+            widths_a = [Cm(13), Cm(2.5)]
+            fixar_largura_tabela(table_a, total_width_cm=16.0, column_widths_cm=[13, 2.5])
 
         for item in dados['itens_anulacao']:
             row = table_a.add_row()
@@ -461,9 +461,18 @@ def gerar_projeto_lei(dados):
         p.runs[0].font.size = Pt(14)
         doc.add_paragraph("\n")
         
-        p = doc.add_paragraph(dados["justificativa"])
-        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        p.runs[0].font.name = 'Times New Roman'
-        p.runs[0].font.size = Pt(14)
+        # O problema de esticar a última linha acontece porque o Streamlit\n vira Shift+Enter no Word
+        # Dividimos o texto por quebras de linha para criar parágrafos reais (Enter)\n
+        paragrafos_justificativa = dados["justificativa"].split('\n')
+        for texto_paragrafo in paragrafos_justificativa:
+            # Pula parágrafos vazios causados por múltiplos Enters
+            if not texto_paragrafo.strip():
+                doc.add_paragraph()
+                continue
+                
+            p = doc.add_paragraph(texto_paragrafo.strip())
+            p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            p.runs[0].font.name = 'Times New Roman'
+            p.runs[0].font.size = Pt(14)
 
     return salvar_docx(doc)
