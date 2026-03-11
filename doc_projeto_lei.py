@@ -116,9 +116,11 @@ def gerar_projeto_lei(dados):
     doc = Document()
     configurar_estilo(doc)
     
-    # Configurar margens oficiais
+    # Configurar margens oficiais e tamanho A4
     sections = doc.sections
     for section in sections:
+        section.page_height = Cm(29.7)
+        section.page_width = Cm(21.0)
         section.top_margin = Cm(0.75)
         section.bottom_margin = Cm(0)
         section.left_margin = Cm(3.0)
@@ -427,7 +429,8 @@ def gerar_projeto_lei(dados):
     data_extenso = f"Prefeitura Municipal de {dados['municipio']}, {hoje.day} de {meses[hoje.month]} de {hoje.year}."
     
     p = doc.add_paragraph(data_extenso)
-    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p.paragraph_format.first_line_indent = Cm(1.27)
     p.runs[0].font.name = 'Times New Roman'
     p.runs[0].font.size = Pt(12)
     
@@ -453,6 +456,7 @@ def gerar_projeto_lei(dados):
         p = doc.add_paragraph("JUSTIFICATIVA")
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.runs[0].bold = True
+        p.runs[0].underline = True
         p.runs[0].font.name = 'Times New Roman'
         p.runs[0].font.size = Pt(14)
         doc.add_paragraph("\n")
