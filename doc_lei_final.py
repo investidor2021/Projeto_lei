@@ -130,9 +130,11 @@ def gerar_lei_final(dados):
     doc = Document()
     configurar_estilo(doc)
     
-    # Configurar margens oficiais
+    # Configurar margens oficiais e tamanho A4
     sections = doc.sections
     for section in sections:
+        section.page_height = Cm(29.7)
+        section.page_width = Cm(21.0)
         section.top_margin = Cm(0.75)
         section.bottom_margin = Cm(0)
         section.left_margin = Cm(3.0)
