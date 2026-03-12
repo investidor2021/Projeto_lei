@@ -314,10 +314,8 @@ def gerar_projeto_lei(dados):
         conector = ", ainda," if (dados['val_exc'] > 0 or dados['val_sup'] > 0) else ""
         total_anul = sum(i['valor'] for i in dados['itens_anulacao'])
         texto_anul = (
-             f"Art. {art_num}º As despesas decorrentes desta lei serão suportadas{conector} com recursos provenientes de "
-             f"anulação parcial ou total de dotações orçamentárias, nos termos do inciso III, § 1º, do artigo 43, "
-             f"da Lei nº 4.320, de 17 de março de 1964, na importância de {format_currency(total_anul)} "
-             f"({extenso_brl(total_anul)}), conforme abaixo:"
+             f"Art.{art_num}º Para cobertura do crédito autorizado no artigo anterior serão anuladas as seguintes dotações: "
+             
         )
         p = doc.add_paragraph(texto_anul)
         p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
