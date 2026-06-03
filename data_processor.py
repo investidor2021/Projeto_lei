@@ -4,14 +4,11 @@ from datetime import datetime, timedelta
 def get_department_name(code):
     """
     Returns the department name based on the code.
-    TODO: Update this dictionary with the actual 'De/Para' rules from the user.
     """
-    # Placeholder mapping
-    mapping = {
-        # Example: "01": "Education",
-    }
-    # Return the code itself if no mapping is found, marked as 'Unknown'
-    return mapping.get(str(code), f"DEP-{code}") 
+    from audesp_codes import DEPARTAMENTOS
+    clean_code = str(code).strip()
+    prefix = clean_code[:8]
+    return DEPARTAMENTOS.get(prefix, f"DEP-{prefix}") 
 
 def organize_sheet(file):
     """
